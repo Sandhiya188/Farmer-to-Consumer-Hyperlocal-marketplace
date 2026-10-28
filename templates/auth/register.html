@@ -68,7 +68,7 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label" for="{{ form.phone_number.id_for_label }}">Mobile Phone Number (for SMS OTP) *</label>
+        <label class="form-label" for="{{ form.phone_number.id_for_label }}">Mobile Phone Number*</label>
         {{ form.phone_number }}
         {% if form.phone_number.errors %}
           <small class="form-error">{{ form.phone_number.errors.0 }}</small>
