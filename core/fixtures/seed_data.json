@@ -1,0 +1,554 @@
+[
+{
+  "model": "auth.user",
+  "pk": 1,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$BWCYj7pI1hoveR5AZR54hv$suCxDz0U+0QhyMmexqR91fNDuvfooDVlJTzrB/2iD9w=",
+    "last_login": null,
+    "is_superuser": true,
+    "username": "admin",
+    "first_name": "",
+    "last_name": "",
+    "email": "admin@farmconnect.local",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-10-17T08:32:00.520Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 5,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$MOhywHIb53ZQtnVvg8IVpQ$tyrNsrx+msbhJ36M+CVPVXZF/rg9UMHKc3ZgJBZwSS4=",
+    "last_login": "2026-10-17T08:34:50.112Z",
+    "is_superuser": false,
+    "username": "Sandhiya",
+    "first_name": "",
+    "last_name": "",
+    "email": "sandhiyag188@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-10-17T08:34:16.178Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 9,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$ulsb6Nn8hDwa2fKzHqezjx$FJfY5f/TLfs6cgDatqoKRnAW+ACpvRiBgStRchjW1T8=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "customer_user",
+    "first_name": "",
+    "last_name": "",
+    "email": "customer@user.in",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-10-17T11:33:44.298Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 10,
+  "fields": {
+    "password": "pbkdf2_sha256$1500000$5CF9HcBiKIEnt3UBjgwlfY$vbcArzHZ/WmkuATsYPW2+l9KbT4zMK15CEbZ57S15B0=",
+    "last_login": "2026-10-17T11:52:10.398Z",
+    "is_superuser": false,
+    "username": "farmer",
+    "first_name": "",
+    "last_name": "",
+    "email": "sandhiyag188@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-10-17T11:51:59.058Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 11,
+  "fields": {
+    "password": "pbkdf2_sha256$1500000$lMvkm9tTJtBiQG8QGGoKJ0$0s7gu9BUhvEJBW1l9nvwmdkCJ/4P+YVEnNMJ+9qdK48=",
+    "last_login": "2026-10-18T15:49:27.628Z",
+    "is_superuser": true,
+    "username": "farmership",
+    "first_name": "",
+    "last_name": "",
+    "email": "sandhiyag188@gmail.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-10-17T11:54:34.586Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 12,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$yiiThNZ5hOzrHF4h43F5Jz$wdFzFIo0VS6LlXyVONzaItSuwiNRzzB55SUE14e2LHw=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "muthu_velan",
+    "first_name": "",
+    "last_name": "",
+    "email": "muthu@pollachiorganic.in",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-10-17T12:22:13.689Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 13,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$p0iHLwvVyZWHHzU7eOiROG$mXgstonIpXV2IXWKIEwr6YS+xapPHzz2FxTdfDPvnaY=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "kavitha_nilgiris",
+    "first_name": "",
+    "last_name": "",
+    "email": "kavitha@nilgirishill.in",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-10-17T12:22:14.454Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 14,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$XfoHSipcaeOVDGOAmg0N8f$Teuz4FjXA18QsufBZl6OBEKYG1JGrcYGOsg33vqvUgg=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "selvam_orchards",
+    "first_name": "",
+    "last_name": "",
+    "email": "selvam@salemorchards.in",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-10-17T12:22:15.226Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 15,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$CtDOCLIRvWvSCiXgzi7JGM$Q+PRJowXFnFieCizM1n56WFTSPvL8iuUqapg+/FeBHM=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "murugan_agro",
+    "first_name": "",
+    "last_name": "",
+    "email": "murugan@dindigulcrops.in",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-10-17T12:22:15.999Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 17,
+  "fields": {
+    "password": "pbkdf2_sha256$1500000$oswJaL5NgqdGk8Q5JG3udz$dy1kGaHTq6b3xWWw+G4lR5WNx3E+PygXgNtq59JpV4o=",
+    "last_login": "2026-10-18T16:20:00.698Z",
+    "is_superuser": false,
+    "username": "Sandhiya@G",
+    "first_name": "",
+    "last_name": "",
+    "email": "sandhiyag188@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-10-18T16:19:43.988Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "core.userprofile",
+  "pk": 1,
+  "fields": {
+    "user": 1,
+    "role": "farmer",
+    "farm_name": "",
+    "phone_number": "9999999999",
+    "location": "HQ",
+    "district": "",
+    "address": "",
+    "latitude": 18.5204,
+    "longitude": 73.8567,
+    "is_verified": true,
+    "otp": null,
+    "otp_created_at": null,
+    "otp_attempts": 0,
+    "otp_resend_count": 0,
+    "otp_last_sent_at": null
+  }
+},
+{
+  "model": "core.userprofile",
+  "pk": 5,
+  "fields": {
+    "user": 5,
+    "role": "farmer",
+    "farm_name": "",
+    "phone_number": "8220265399",
+    "location": "attayampatty/salem",
+    "district": "",
+    "address": "5/165 pethampatty",
+    "latitude": 18.5204,
+    "longitude": 73.8567,
+    "is_verified": true,
+    "otp": null,
+    "otp_created_at": "2026-10-17T08:34:17.441Z",
+    "otp_attempts": 0,
+    "otp_resend_count": 0,
+    "otp_last_sent_at": null
+  }
+},
+{
+  "model": "core.userprofile",
+  "pk": 9,
+  "fields": {
+    "user": 9,
+    "role": "customer",
+    "farm_name": "",
+    "phone_number": "+91 98401 23456",
+    "location": "Coimbatore City",
+    "district": "",
+    "address": "12, Crosscut Road, Gandhipuram, Coimbatore",
+    "latitude": 18.5204,
+    "longitude": 73.8567,
+    "is_verified": true,
+    "otp": null,
+    "otp_created_at": null,
+    "otp_attempts": 0,
+    "otp_resend_count": 0,
+    "otp_last_sent_at": null
+  }
+},
+{
+  "model": "core.userprofile",
+  "pk": 10,
+  "fields": {
+    "user": 10,
+    "role": "farmer",
+    "farm_name": "ganesan farms",
+    "phone_number": "8220265399",
+    "location": "attayampatty/salem",
+    "district": "",
+    "address": "5/165 pethampatty",
+    "latitude": 18.5204,
+    "longitude": 73.8567,
+    "is_verified": true,
+    "otp": null,
+    "otp_created_at": "2026-10-17T11:52:00.105Z",
+    "otp_attempts": 0,
+    "otp_resend_count": 0,
+    "otp_last_sent_at": null
+  }
+},
+{
+  "model": "core.userprofile",
+  "pk": 11,
+  "fields": {
+    "user": 12,
+    "role": "farmer",
+    "farm_name": "Pollachi Green Valley Organic Farm",
+    "phone_number": "+91 98421 77881",
+    "location": "Pollachi, Coimbatore",
+    "district": "",
+    "address": "Survey 112, Anaimalai Road, Pollachi",
+    "latitude": 10.6609,
+    "longitude": 77.0047,
+    "is_verified": true,
+    "otp": null,
+    "otp_created_at": null,
+    "otp_attempts": 0,
+    "otp_resend_count": 0,
+    "otp_last_sent_at": null
+  }
+},
+{
+  "model": "core.userprofile",
+  "pk": 12,
+  "fields": {
+    "user": 13,
+    "role": "farmer",
+    "farm_name": "Nilgiris Mountain Mist Organics",
+    "phone_number": "+91 94432 55660",
+    "location": "Ooty, The Nilgiris",
+    "district": "",
+    "address": "Estate Road, Coonoor-Ooty Valley",
+    "latitude": 11.4102,
+    "longitude": 76.695,
+    "is_verified": true,
+    "otp": null,
+    "otp_created_at": null,
+    "otp_attempts": 0,
+    "otp_resend_count": 0,
+    "otp_last_sent_at": null
+  }
+},
+{
+  "model": "core.userprofile",
+  "pk": 13,
+  "fields": {
+    "user": 14,
+    "role": "farmer",
+    "farm_name": "Salem Royal Mango & Fruit Belt",
+    "phone_number": "+91 97890 33441",
+    "location": "Salem",
+    "district": "",
+    "address": "Shevaroy Foothills, Yercaud Road, Salem",
+    "latitude": 11.6643,
+    "longitude": 78.146,
+    "is_verified": true,
+    "otp": null,
+    "otp_created_at": null,
+    "otp_attempts": 0,
+    "otp_resend_count": 0,
+    "otp_last_sent_at": null
+  }
+},
+{
+  "model": "core.userprofile",
+  "pk": 14,
+  "fields": {
+    "user": 15,
+    "role": "farmer",
+    "farm_name": "Dindigul Traditional Agro Fields",
+    "phone_number": "+91 96551 22339",
+    "location": "Dindigul",
+    "district": "",
+    "address": "Palani Highway, Dindigul Agro Belt",
+    "latitude": 10.3673,
+    "longitude": 77.9803,
+    "is_verified": true,
+    "otp": null,
+    "otp_created_at": null,
+    "otp_attempts": 0,
+    "otp_resend_count": 0,
+    "otp_last_sent_at": null
+  }
+},
+{
+  "model": "core.userprofile",
+  "pk": 15,
+  "fields": {
+    "user": 11,
+    "role": "customer",
+    "farm_name": "",
+    "phone_number": "9876543210",
+    "location": "Tamil Nadu",
+    "district": "",
+    "address": "",
+    "latitude": 18.5204,
+    "longitude": 73.8567,
+    "is_verified": true,
+    "otp": null,
+    "otp_created_at": null,
+    "otp_attempts": 0,
+    "otp_resend_count": 0,
+    "otp_last_sent_at": null
+  }
+},
+{
+  "model": "core.userprofile",
+  "pk": 17,
+  "fields": {
+    "user": 17,
+    "role": "farmer",
+    "farm_name": "ganesan farms",
+    "phone_number": "8220265399",
+    "location": "farmership",
+    "district": "",
+    "address": "Rajapalayam",
+    "latitude": 18.5204,
+    "longitude": 73.8567,
+    "is_verified": true,
+    "otp": null,
+    "otp_created_at": "2026-10-18T16:19:45.094Z",
+    "otp_attempts": 0,
+    "otp_resend_count": 0,
+    "otp_last_sent_at": null
+  }
+},
+{
+  "model": "core.product",
+  "pk": 16,
+  "fields": {
+    "farmer": 12,
+    "name": "Fresh Red Country Tomatoes",
+    "category": "vegetable",
+    "price_per_kg": "35.00",
+    "stock_quantity": "149.50",
+    "unit": "kg",
+    "description": "Freshly handpicked vine-ripened red country tomatoes.",
+    "harvest_date": "2026-10-17",
+    "image": "",
+    "image_url": "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=800&auto=format&fit=crop&q=80",
+    "created_at": "2026-10-17T12:22:14.435Z",
+    "updated_at": "2026-10-17T12:22:14.435Z"
+  }
+},
+{
+  "model": "core.product",
+  "pk": 17,
+  "fields": {
+    "farmer": 12,
+    "name": "Crisp Garden Green Spinach",
+    "category": "vegetable",
+    "price_per_kg": "25.00",
+    "stock_quantity": "60.00",
+    "unit": "bunch",
+    "description": "Tender spinach leaves harvested fresh with morning dew.",
+    "harvest_date": "2026-10-17",
+    "image": "",
+    "image_url": "https://images.unsplash.com/photo-1576045057995-568f588f82fb?w=800&auto=format&fit=crop&q=80",
+    "created_at": "2026-10-17T12:22:14.441Z",
+    "updated_at": "2026-10-17T12:22:14.441Z"
+  }
+},
+{
+  "model": "core.product",
+  "pk": 18,
+  "fields": {
+    "farmer": 12,
+    "name": "Green Bell Peppers (Capsicum)",
+    "category": "vegetable",
+    "price_per_kg": "45.00",
+    "stock_quantity": "80.00",
+    "unit": "kg",
+    "description": "Crunchy thick-walled greenhouse capsicum.",
+    "harvest_date": "2026-10-17",
+    "image": "",
+    "image_url": "https://images.unsplash.com/photo-1563565375-f3fdfdbefa83?w=800&auto=format&fit=crop&q=80",
+    "created_at": "2026-10-17T12:22:14.447Z",
+    "updated_at": "2026-10-17T12:22:14.448Z"
+  }
+},
+{
+  "model": "core.product",
+  "pk": 19,
+  "fields": {
+    "farmer": 13,
+    "name": "Fresh Sweet Ooty Carrots",
+    "category": "vegetable",
+    "price_per_kg": "45.00",
+    "stock_quantity": "180.00",
+    "unit": "kg",
+    "description": "Crunchy, sweet hill-grown carrots washed in mountain spring water.",
+    "harvest_date": "2026-10-17",
+    "image": "",
+    "image_url": "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?w=800&auto=format&fit=crop&q=80",
+    "created_at": "2026-10-17T12:22:15.213Z",
+    "updated_at": "2026-10-17T12:22:15.213Z"
+  }
+},
+{
+  "model": "core.product",
+  "pk": 20,
+  "fields": {
+    "farmer": 13,
+    "name": "Hillside Fresh Strawberries",
+    "category": "fruit",
+    "price_per_kg": "160.00",
+    "stock_quantity": "45.00",
+    "unit": "box",
+    "description": "Fragrant hand-picked strawberries grown at 2000m altitude.",
+    "harvest_date": "2026-10-17",
+    "image": "",
+    "image_url": "https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=800&auto=format&fit=crop&q=80",
+    "created_at": "2026-10-17T12:22:15.218Z",
+    "updated_at": "2026-10-17T12:22:15.219Z"
+  }
+},
+{
+  "model": "core.product",
+  "pk": 21,
+  "fields": {
+    "farmer": 14,
+    "name": "Salem Sweet Alphonso Mangoes",
+    "category": "fruit",
+    "price_per_kg": "140.00",
+    "stock_quantity": "70.00",
+    "unit": "kg",
+    "description": "Tree-ripened, naturally sweet fragrant Alphonso mangoes.",
+    "harvest_date": "2026-10-17",
+    "image": "",
+    "image_url": "https://images.unsplash.com/photo-1553279768-865429fa0078?w=800&auto=format&fit=crop&q=80",
+    "created_at": "2026-10-17T12:22:15.986Z",
+    "updated_at": "2026-10-17T12:22:15.986Z"
+  }
+},
+{
+  "model": "core.product",
+  "pk": 22,
+  "fields": {
+    "farmer": 14,
+    "name": "Seedless Sweet Black Grapes",
+    "category": "fruit",
+    "price_per_kg": "90.00",
+    "stock_quantity": "109.50",
+    "unit": "kg",
+    "description": "Sweet crispy table grapes harvested directly from vines.",
+    "harvest_date": "2026-10-17",
+    "image": "",
+    "image_url": "https://images.unsplash.com/photo-1537640538966-79f369143f8f?w=800&auto=format&fit=crop&q=80",
+    "created_at": "2026-10-17T12:22:15.992Z",
+    "updated_at": "2026-10-17T12:22:15.992Z"
+  }
+},
+{
+  "model": "core.product",
+  "pk": 23,
+  "fields": {
+    "farmer": 15,
+    "name": "Sun-Dried Red Onions",
+    "category": "vegetable",
+    "price_per_kg": "32.00",
+    "stock_quantity": "249.00",
+    "unit": "kg",
+    "description": "Export quality sun-cured red onions with high shelf-life.",
+    "harvest_date": "2026-10-17",
+    "image": "",
+    "image_url": "https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?w=800&auto=format&fit=crop&q=80",
+    "created_at": "2026-10-17T12:22:16.726Z",
+    "updated_at": "2026-10-17T12:22:16.726Z"
+  }
+},
+{
+  "model": "core.product",
+  "pk": 24,
+  "fields": {
+    "farmer": 11,
+    "name": "Ladies Finger",
+    "category": "vegetable",
+    "price_per_kg": "35.00",
+    "stock_quantity": "13.00",
+    "unit": "kg",
+    "description": "Fresh ladiesfinger",
+    "harvest_date": "2026-10-18",
+    "image": "harvests/ladiesfinger.jpg",
+    "image_url": "",
+    "created_at": "2026-10-18T15:20:04.281Z",
+    "updated_at": "2026-10-18T15:20:04.281Z"
+  }
+}
+]

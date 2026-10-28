@@ -1,5 +1,8 @@
-django>=4.2,<6.0
+Django>=4.2,<6.2
 razorpay>=1.4.1
 Pillow>=9.5.0
-gunicorn
-whitenoise
+gunicorn>=21.2.0
+whitenoise>=6.6.0
+python-dotenv>=1.0.0
+twilio>=8.0.0
+requests>=2.31.0
