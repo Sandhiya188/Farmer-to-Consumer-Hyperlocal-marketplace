@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}My Pre-Orders - FarmConnect{% endblock %}
+
+{% block content %}
+<div class="orders-page-header">
+  <h2>📦 My Fresh Harvest Pre-Orders</h2>
+  <p class="text-muted">
+    Track the progress of your orders as local farmers prepare and dispatch your produce.
+  </p>
+</div>
+
+{% if orders %}
+  <div class="orders-list-wrapper">
+    {% for order in orders %}
+      <div class="card order-card-item">
+        <div class="order-card-row">
+          <div>
+            <div class="order-card-header">
+              <h3 class="order-card-title">Order #{{ order.order_number }}</h3>
+              <span class="badge 
+                {% if order.order_status == 'placed' %}badge-veg
+                {% elif order.order_status == 'preparing' %}badge-veg
+                {% elif order.order_status == 'ready' %}badge-instock
+                {% else %}badge-outstock{% endif %}">
+                {{ order.get_order_status_display }}
+              </span>
+            </div>
+            <p class="order-card-meta">
+              Placed: {{ order.created_at|date:"d M Y, h:i A" }} • {{ order.items.count }} items
+            </p>
+          </div>
+
+          <div class="order-card-price-action">
+            <div class="order-card-amount">₹{{ order.total_amount }}</div>
+            <a href="{% url 'order_detail' order.id %}" class="btn btn-outline btn-sm">
+              View Live Tracker →
+            </a>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="card empty-state-card">
+    <p class="text-muted empty-state-desc">You have not placed any pre-orders yet.</p>
+    <a href="{% url 'customer_browse' %}" class="btn btn-primary mt-2">
+      Browse Local Farmers' Harvests
+    </a>
+  </div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,160 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}FarmConnect - Direct Local Farmers Marketplace{% endblock %}</title>
+  
+  <!-- Immediate Theme Initializer & Global Toggle Controller -->
+  <script>
+    (function () {
+      try {
+        var savedTheme = localStorage.getItem('fc_theme');
+        // Always default to 'light' (Day Theme) unless user explicitly saved 'dark'
+        if (savedTheme === 'dark') {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+
+    function toggleFarmConnectTheme() {
+      var html = document.documentElement;
+      var current = html.getAttribute('data-theme') || 'light';
+      var next = (current === 'dark') ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      try {
+        localStorage.setItem('fc_theme', next);
+      } catch (e) {}
+      updateThemeToggleUI(next);
+    }
+
+    function updateThemeToggleUI(theme) {
+      var btn = document.getElementById('theme-toggle-btn');
+      if (!btn) return;
+      var isDark = (theme === 'dark');
+      btn.setAttribute('title', isDark ? 'Switch to Day Theme (☀️)' : 'Switch to Night Theme (🌙)');
+      btn.setAttribute('aria-label', isDark ? 'Switch to Day Theme' : 'Switch to Night Theme');
+      var lightIcon = btn.querySelector('.theme-icon-light');
+      var darkIcon = btn.querySelector('.theme-icon-dark');
+      if (lightIcon) lightIcon.style.display = isDark ? 'inline-block' : 'none';
+      if (darkIcon) darkIcon.style.display = isDark ? 'none' : 'inline-block';
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var current = document.documentElement.getAttribute('data-theme') || 'light';
+      updateThemeToggleUI(current);
+    });
+  </script>
+
+  <!-- Master Unified Stylesheet (Zero Inline Styles) -->
+  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=unified_v6">
+  
+  <!-- Self-Hosted Map CSS -->
+  <link rel="stylesheet" href="{% static 'leaflet/leaflet.css' %}">
+  
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="{% url 'home' %}" class="brand-logo">
+        <span class="brand-icon">FC</span>
+        <span>FarmConnect</span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="{% url 'home' %}#map-section" class="nav-link">Live Farmers Map</a></li>
+        <li><a href="{% url 'customer_browse' %}" class="nav-link">Fresh Produce</a></li>
+
+        {% if user.is_authenticated %}
+          {% if user.is_superuser %}
+            <li><a href="{% url 'farmer_dashboard' %}" class="nav-link">Farmer Portal</a></li>
+            <li>
+              <a href="{% url 'cart_view' %}" class="nav-link">
+                Cart
+                <span class="badge badge-instock cart-badge">{{ global_cart_count }}</span>
+              </a>
+            </li>
+            <li><a href="{% url 'customer_orders' %}" class="nav-link">My Pre-Orders</a></li>
+          {% elif current_profile.role == 'farmer' %}
+            <li><a href="{% url 'farmer_dashboard' %}" class="nav-link">Farmer Portal</a></li>
+            <li><a href="{% url 'add_product' %}" class="nav-link">+ Add Harvest</a></li>
+            <li><a href="{% url 'farmer_orders' %}" class="nav-link">Orders</a></li>
+          {% else %}
+            <li>
+              <a href="{% url 'cart_view' %}" class="nav-link">
+                Cart
+                <span class="badge badge-instock cart-badge">{{ global_cart_count }}</span>
+              </a>
+            </li>
+            <li><a href="{% url 'customer_orders' %}" class="nav-link">My Pre-Orders</a></li>
+          {% endif %}
+
+          <li>
+            <span class="role-badge role-{{ current_profile.role }}">
+              {{ current_profile.get_role_display|default:user.username }}
+              {% if current_profile.location %} • {{ current_profile.location }}{% endif %}
+            </span>
+          </li>
+          <li><a href="{% url 'logout' %}" class="btn btn-outline btn-sm">Log Out</a></li>
+        {% else %}
+          <li><a href="{% url 'login' %}" class="nav-link">Sign In</a></li>
+          <li><a href="{% url 'register' %}" class="btn btn-primary btn-sm">Join FarmConnect</a></li>
+        {% endif %}
+
+        <!-- Dark / Light Theme Toggle Button -->
+        <li>
+          <button id="theme-toggle-btn" 
+                  class="theme-toggle-btn" 
+                  type="button" 
+                  onclick="toggleFarmConnectTheme()" 
+                  title="Toggle Day / Night Theme"
+                  aria-label="Toggle Day / Night Theme">
+            <span class="theme-icon-light">☀️</span>
+            <span class="theme-icon-dark">🌙</span>
+          </button>
+        </li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- Flash Messages & OTP Notifications -->
+  {% if messages %}
+    <div class="container alert-container">
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+          <span>{{ message }}</span>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <!-- Main Content Body -->
+  <main class="container">
+    {% block content %}
+    {% endblock %}
+  </main>
+
+  <!-- Global Footer -->
+  <footer>
+    <div class="container">
+      <p><strong>FarmConnect</strong> — Direct Farm to Customer Platform</p>
+      <p class="footer-subtext">
+        Real interactive map connecting verified local farmers directly with consumers.
+      </p>
+    </div>
+  </footer>
+
+  <!-- Self-Hosted Map JS & Unified Application JS -->
+  <script src="{% static 'leaflet/leaflet.js' %}"></script>
+  <script src="{% static 'js/main.js' %}?v=unified_v6"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

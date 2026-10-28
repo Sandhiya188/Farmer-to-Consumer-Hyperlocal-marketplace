@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block title %}Track Order #{{ order.order_number }} - FarmConnect{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+  <a href="{% if is_farmer %}{% url 'farmer_orders' %}{% else %}{% url 'customer_orders' %}{% endif %}" class="btn btn-outline btn-sm">
+    ← Back to Orders
+  </a>
+</div>
+
+<div class="card order-detail-card">
+  <div class="order-detail-header">
+    <div>
+      <h2 class="order-detail-title">Order #{{ order.order_number }}</h2>
+      <p class="order-detail-date">
+        Ordered on {{ order.created_at|date:"d M Y, h:i A" }}
+      </p>
+    </div>
+
+    <div class="order-detail-price-box">
+      <div class="order-detail-amount">₹{{ order.total_amount }}</div>
+      <span class="badge badge-instock">{{ order.get_payment_method_display }}</span>
+      <span class="badge {% if order.payment_status == 'completed' %}badge-instock{% else %}badge-veg{% endif %}">
+        {{ order.get_payment_status_display }}
+      </span>
+    </div>
+  </div>
+
+  <!-- Real-Time Workflow Tracker -->
+  <div class="tracker-section">
+    <h3 class="tracker-heading">
+      Live Farm-to-Customer Progress
+    </h3>
+
+    <div class="order-stepper">
+      <div class="step-item completed">
+        <div class="step-circle">✓</div>
+        <div class="step-label">1. Order Placed<br><small class="text-success">Stock Validated</small></div>
+      </div>
+
+      <div class="step-item {% if order.order_status in 'preparing,ready,delivered' %}completed{% elif order.order_status == 'placed' %}active{% endif %}">
+        <div class="step-circle">👨‍🌾</div>
+        <div class="step-label">2. Farmer Prepares<br><small>Washing &amp; Packing</small></div>
+      </div>
+
+      <div class="step-item {% if order.order_status in 'ready,delivered' %}completed{% elif order.order_status == 'preparing' %}active{% endif %}">
+        <div class="step-circle">🚚</div>
+        <div class="step-label">3. Ready for Collection<br><small>Dispatched</small></div>
+      </div>
+
+      <div class="step-item {% if order.order_status == 'delivered' %}completed{% elif order.order_status == 'ready' %}active{% endif %}">
+        <div class="step-circle">📦</div>
+        <div class="step-label">4. Customer Receives<br><small>Order Complete</small></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ordered Harvest Produce -->
+  <div class="ordered-produce-section">
+    <h3 class="section-subtitle">Harvest Produce Included</h3>
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Produce</th>
+            <th>Farmer</th>
+            <th>Quantity</th>
+            <th>Unit Price</th>
+            <th>Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in order.items.all %}
+            <tr>
+              <td><strong>{{ item.product_name }}</strong></td>
+              <td>👨‍🌾 {{ item.farmer.username }} (📍 {{ item.farmer.profile.location|default:"Local" }})</td>
+              <td>{{ item.quantity }} {{ item.unit }}</td>
+              <td>₹{{ item.price_per_kg }} / {{ item.unit }}</td>
+              <td><strong>₹{{ item.subtotal }}</strong></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Delivery Information -->
+  <div class="delivery-info-box">
+    <h4 class="delivery-info-title">Delivery Destination &amp; Contact:</h4>
+    <p class="delivery-info-text">
+      <strong>Location:</strong> {{ order.delivery_location }} &bull;
+      <strong>Address:</strong> {{ order.delivery_address }} &bull;
+      <strong>Recipient Phone:</strong> {{ order.contact_phone }}
+    </p>
+  </div>
+</div>
+{% endblock %}

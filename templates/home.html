@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+
+{% block title %}FarmConnect - Direct Local Farmers Marketplace &amp; Original Map{% endblock %}
+
+{% block content %}
+<!-- Hero Section with Authentic Farm Photography -->
+<section class="hero">
+  <div class="container">
+    <h1>Direct from Real Local Farmers</h1>
+    <p>Discover verified organic growers on our interactive live farm map. Authentic fresh harvests, fair pricing, zero middlemen.</p>
+    <div class="hero-actions">
+      <a href="#map-section" class="btn btn-outline hero-btn-outline">
+        Explore Farmers on Map
+      </a>
+      <a href="{% url 'customer_browse' %}" class="btn btn-accent hero-btn-accent">
+        Browse Fresh Produce
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Original Google Map Section with District, Area & Street Level Resolution -->
+<div id="map-section" class="card map-section-card">
+  <div class="map-section-header">
+    <div>
+      <h2 class="map-section-title">📍 Original Farmers Location Map</h2>
+      <p class="text-muted map-section-subtitle">
+        Original Google Map with full District, Area, and Street names. Click any farmer to navigate to their farm location.
+      </p>
+    </div>
+    <span class="badge badge-instock map-counter-badge">
+      {{ farmers_json|length }} Local Farmers Connected
+    </span>
+  </div>
+
+  <!-- Farmer Quick Location Selector Buttons -->
+  <div class="farmer-pills-row">
+    {% for farmer in farmers_json %}
+      <button type="button" 
+              class="farmer-map-pill btn btn-sm {% if forloop.first %}btn-primary{% else %}btn-outline{% endif %}"
+              onclick="selectFarmerMap(this, '{{ farmer.address|default:farmer.location }}, Tamil Nadu', '{{ farmer.farm_name }}', '{{ farmer.location }}', '{{ farmer.phone }}')">
+        📍 {{ farmer.farm_name }} ({{ farmer.location }})
+      </button>
+    {% endfor %}
+  </div>
+
+  <!-- Active Farm Information Card -->
+  <div id="farmer-active-info" class="farmer-active-banner">
+    <div>
+      <strong id="active-farm-name" class="active-farm-title">
+        {{ farmers_json.0.farm_name|default:"Pollachi Green Valley Organic Farm" }}
+      </strong>
+      <span id="active-farm-loc" class="active-farm-location">
+        📍 Location: {{ farmers_json.0.location|default:"Pollachi, Coimbatore" }} • 📞 {{ farmers_json.0.phone|default:"+91 98421 77881" }}
+      </span>
+    </div>
+    <div class="active-farm-actions">
+      <a id="active-farm-browse-btn" href="/browse/?location={{ farmers_json.0.location|default:'Pollachi' }}" class="btn btn-primary btn-sm">
+        Browse Farmer's Produce →
+      </a>
+      <a id="active-farm-google-btn" href="https://www.google.com/maps/search/?api=1&query=Pollachi,Coimbatore,Tamil+Nadu" target="_blank" class="btn btn-outline btn-sm">
+        Open in Google Maps App ↗
+      </a>
+    </div>
+  </div>
+
+  <!-- Official Google Map Embed: Full Street, Area & District Names -->
+  <div class="map-iframe-container">
+    <iframe id="google-maps-frame"
+            src="https://maps.google.com/maps?q={{ farmers_json.0.address|default:'Pollachi,Coimbatore,Tamil+Nadu' }}&t=m&z=13&ie=UTF8&iwloc=&output=embed"
+            class="map-iframe"
+            frameborder="0" 
+            allowfullscreen="" 
+            loading="lazy">
+    </iframe>
+  </div>
+</div>
+
+<!-- Fresh Harvest Produce with Real Photography -->
+<div class="featured-harvest-section">
+  <div class="featured-header">
+    <h2>Fresh Harvest Available Today</h2>
+    <a href="{% url 'customer_browse' %}" class="btn btn-outline btn-sm">View Full Catalog →</a>
+  </div>
+
+  {% if featured_products %}
+    <div class="cards-grid">
+      {% for product in featured_products %}
+        <div class="card product-card">
+          <div class="card-img-wrapper">
+            <img src="{{ product.display_image }}" alt="{{ product.name }}" loading="lazy">
+          </div>
+          
+          <div class="card-body">
+            <div class="product-card-badges">
+              <span class="badge {% if product.category == 'vegetable' %}badge-veg{% else %}badge-fruit{% endif %}">
+                {{ product.get_category_display }}
+              </span>
+              <span class="badge badge-instock">
+                In Stock: {{ product.stock_quantity }} {{ product.unit }}
+              </span>
+            </div>
+
+            <h3 class="product-card-title">{{ product.name }}</h3>
+            <p class="product-card-farmer-info">
+              Grower: <strong>{{ product.farmer.username }}</strong> • {{ product.farmer.profile.location|default:"Nearby" }}
+            </p>
+
+            <div class="price-tag">
+              ₹{{ product.price_per_kg }} <span class="product-price-unit">/ {{ product.unit }}</span>
+            </div>
+
+            <div class="product-card-action">
+              <a href="{% url 'product_detail' product.id %}" class="btn btn-primary full-width">
+                Select Quantity &amp; Pre-Order
+              </a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="card empty-state-card">
+      <p class="text-muted empty-state-desc">No fresh crops listed yet.</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function selectFarmerMap(button, query, farmName, location, phone) {
+    document.querySelectorAll('.farmer-map-pill').forEach(function(btn) {
+      btn.classList.remove('btn-primary');
+      btn.classList.add('btn-outline');
+    });
+    button.classList.add('btn-primary');
+    button.classList.remove('btn-outline');
+
+    var encodedQuery = encodeURIComponent(query);
+    var iframe = document.getElementById('google-maps-frame');
+    if (iframe) {
+      iframe.src = 'https://maps.google.com/maps?q=' + encodedQuery + '&t=m&z=13&ie=UTF8&iwloc=&output=embed';
+    }
+
+    var nameEl = document.getElementById('active-farm-name');
+    var locEl = document.getElementById('active-farm-loc');
+    var browseBtn = document.getElementById('active-farm-browse-btn');
+    var googleBtn = document.getElementById('active-farm-google-btn');
+
+    if (nameEl) nameEl.innerText = farmName;
+    if (locEl) locEl.innerHTML = '📍 Location: ' + location + ' • 📞 ' + phone;
+    if (browseBtn) browseBtn.href = '/browse/?location=' + encodeURIComponent(location);
+    if (googleBtn) googleBtn.href = 'https://www.google.com/maps/search/?api=1&query=' + encodedQuery;
+  }
+</script>
+{% endblock %}

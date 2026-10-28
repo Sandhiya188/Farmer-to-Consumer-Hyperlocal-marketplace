@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+{% block title %}UPI Payment - FarmConnect{% endblock %}
+
+{% block content %}
+<div class="upi-checkout-container">
+  <div class="card upi-card">
+    
+    <div class="upi-header">
+      <div class="upi-badge-icon">⚡</div>
+      <h2 class="upi-title">Instant UPI Payment</h2>
+      <p class="upi-subtitle">Scan QR or Pay with any UPI App for Order <strong>#{{ order.order_number }}</strong></p>
+    </div>
+
+    <!-- Amount Display Box -->
+    <div class="upi-amount-box">
+      <div class="upi-amount-row">
+        <span class="upi-amount-label">Total Amount to Pay:</span>
+        <span class="upi-amount-value">₹{{ order.total_amount }}</span>
+      </div>
+      <div class="upi-timer-row">
+        <span>Payment Window:</span>
+        <span id="upi-timer" class="upi-timer">05:00</span>
+      </div>
+    </div>
+
+    <!-- QR Code Container -->
+    <div class="upi-qr-section">
+      <div class="upi-qr-frame">
+        <img src="{{ qr_code_url }}" alt="UPI Payment QR Code" class="upi-qr-image" id="upi-qr-img">
+      </div>
+      <p class="upi-scan-note">Scan with <strong>Google Pay</strong>, <strong>PhonePe</strong>, <strong>Paytm</strong>, or <strong>BHIM</strong></p>
+    </div>
+
+    <!-- Copy UPI ID -->
+    <div class="upi-id-box">
+      <span class="upi-id-label">UPI ID:</span>
+      <code id="upi-vpa-text" class="upi-vpa">{{ upi_id }}</code>
+      <button type="button" class="btn btn-outline btn-sm upi-copy-btn" id="copy-upi-btn" onclick="copyUpiId()">
+        📋 Copy
+      </button>
+    </div>
+
+    <!-- Mobile Quick Pay Apps -->
+    <div class="upi-apps-section">
+      <div class="upi-apps-title">Or Pay Directly with App:</div>
+      <div class="upi-apps-grid">
+        <a href="{{ upi_uri }}" class="upi-app-btn upi-gpay" target="_blank">
+          <span>🔵 GPay</span>
+        </a>
+        <a href="{{ upi_uri }}" class="upi-app-btn upi-phonepe" target="_blank">
+          <span>🟣 PhonePe</span>
+        </a>
+        <a href="{{ upi_uri }}" class="upi-app-btn upi-paytm" target="_blank">
+          <span>🔷 Paytm</span>
+        </a>
+        <a href="{{ upi_uri }}" class="upi-app-btn upi-bhim" target="_blank">
+          <span>🇮🇳 BHIM UPI</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Verification Form -->
+    <form id="upi-confirm-form" method="POST" action="{% url 'upi_verify' order.id %}" class="upi-form">
+      {% csrf_token %}
+      
+      <div class="form-group">
+        <label for="upi_transaction_id" class="form-label">
+          UPI Reference / UTR Number (Optional for test):
+        </label>
+        <input 
+          type="text" 
+          name="upi_transaction_id" 
+          id="upi_transaction_id" 
+          class="form-input" 
+          placeholder="e.g. 408212345678 or Bank Ref No."
+        >
+      </div>
+
+      <div class="upi-action-buttons">
+        <button type="submit" class="btn btn-primary btn-lg upi-submit-btn">
+          ✓ Confirm Payment of ₹{{ order.total_amount }}
+        </button>
+
+        <button type="button" class="btn btn-accent btn-sm upi-demo-btn" onclick="simulateInstantPayment()">
+          ⚡ Fast Demo Pay (Instant Test)
+        </button>
+      </div>
+    </form>
+
+    <div class="upi-footer-note">
+      🔒 Direct Farm Transfer • 100% Secure • Instant Pre-Order Confirmation
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Countdown Timer
+  let timeLeft = 300;
+  const timerDisplay = document.getElementById('upi-timer');
+  const timerInterval = setInterval(function() {
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      if (timerDisplay) timerDisplay.innerText = "Expired";
+    } else {
+      timeLeft--;
+      const minutes = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+      const seconds = (timeLeft % 60).toString().padStart(2, '0');
+      if (timerDisplay) timerDisplay.innerText = `${minutes}:${seconds}`;
+    }
+  }, 1000);
+
+  // Copy UPI ID function
+  function copyUpiId() {
+    const text = document.getElementById('upi-vpa-text').innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById('copy-upi-btn');
+      btn.innerText = "✓ Copied!";
+      setTimeout(() => { btn.innerText = "📋 Copy"; }, 2000);
+    }).catch(() => {
+      alert("UPI ID: " + text);
+    });
+  }
+
+  // Fast Demo Pay
+  function simulateInstantPayment() {
+    const randomUtr = "UPI" + Math.floor(100000000000 + Math.random() * 900000000000);
+    document.getElementById('upi_transaction_id').value = randomUtr;
+    document.getElementById('upi-confirm-form').submit();
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign In - FarmConnect{% endblock %}
+
+{% block content %}
+<div class="form-card auth-form-card">
+  <div class="auth-card-header">
+    <h2>Sign In to FarmConnect</h2>
+    <p class="text-muted auth-card-subtitle">
+      Access your farmer portal or customer marketplace
+    </p>
+  </div>
+
+  <form method="POST">
+    {% csrf_token %}
+
+    <div class="form-group">
+      <label class="form-label">Username</label>
+      <input type="text" name="username" class="form-input" placeholder="Enter your username" required>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Password</label>
+      <input type="password" name="password" class="form-input" placeholder="Enter your password" required>
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-lg full-width mt-2">
+      Log In
+    </button>
+  </form>
+
+  <div class="auth-card-footer">
+    Don't have an account yet? 
+    <a href="{% url 'register' %}" class="auth-link">Create Account</a>
+  </div>
+</div>
+{% endblock %}

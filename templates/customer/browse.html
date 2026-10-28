@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block title %}Browse Fresh Produce - FarmConnect{% endblock %}
+
+{% block content %}
+<div class="browse-header">
+  <h2>Fresh Harvest Marketplace</h2>
+  <p class="text-muted">
+    Browse freshly harvested fruits and vegetables directly from local growers in your area.
+  </p>
+</div>
+
+<!-- Filter Bar: Location, Category, Search -->
+<form method="GET" class="filter-bar">
+  <div class="filter-group filter-location-group">
+    <label class="filter-label" for="browse-location-select">📍 Location:</label>
+    <select name="location" id="browse-location-select" class="form-select filter-select" onchange="this.form.submit()">
+      <option value="">All Nearby Regions</option>
+      {% for loc in unique_locations %}
+        <option value="{{ loc }}" {% if selected_location == loc %}selected{% endif %}>{{ loc }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="filter-categories-group">
+    <a href="?{% if selected_location %}location={{ selected_location }}&{% endif %}{% if search_query %}q={{ search_query }}{% endif %}" 
+       class="filter-pill {% if not selected_category %}active{% endif %}">
+      All Harvests
+    </a>
+    <a href="?category=vegetable{% if selected_location %}&location={{ selected_location }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}" 
+       class="filter-pill {% if selected_category == 'vegetable' %}active{% endif %}">
+      🥬 Vegetables
+    </a>
+    <a href="?category=fruit{% if selected_location %}&location={{ selected_location }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}" 
+       class="filter-pill {% if selected_category == 'fruit' %}active{% endif %}">
+      🍎 Fruits
+    </a>
+  </div>
+
+  <div class="filter-search-group">
+    <input type="text" name="q" value="{{ search_query }}" class="form-input filter-search-input" placeholder="Search crops...">
+    {% if selected_category %}
+      <input type="hidden" name="category" value="{{ selected_category }}">
+    {% endif %}
+    <button type="submit" class="btn btn-primary filter-search-btn">Search</button>
+  </div>
+</form>
+
+<!-- Products Grid with Real Photos -->
+{% if products %}
+  <div class="cards-grid">
+    {% for product in products %}
+      <div class="card product-card">
+        <div class="card-img-wrapper">
+          <img src="{{ product.display_image }}" alt="{{ product.name }}" loading="lazy">
+        </div>
+        
+        <div class="card-body">
+          <div class="product-card-badges">
+            <span class="badge {% if product.category == 'vegetable' %}badge-veg{% else %}badge-fruit{% endif %}">
+              {{ product.get_category_display }}
+            </span>
+            
+            {% if product.stock_quantity > 0 %}
+              <span class="badge badge-instock">Stock: {{ product.stock_quantity }} {{ product.unit }}</span>
+            {% else %}
+              <span class="badge badge-outstock">Out of Stock</span>
+            {% endif %}
+          </div>
+
+          <h3 class="product-card-title">{{ product.name }}</h3>
+
+          <div class="product-card-farmer-info">
+            Farmer: <strong>{{ product.farmer.username }}</strong><br>
+            Location: {{ product.farmer.profile.location|default:"Nearby Farm" }}<br>
+            Harvested: {{ product.harvest_date|date:"d M Y" }}
+          </div>
+
+          <div class="price-tag">
+            ₹{{ product.price_per_kg }} <span class="product-price-unit">/ {{ product.unit }}</span>
+          </div>
+
+          <div class="product-card-action">
+            {% if product.stock_quantity > 0 %}
+              <a href="{% url 'product_detail' product.id %}" class="btn btn-primary full-width">
+                Select Quantity &amp; Pre-Order
+              </a>
+            {% else %}
+              <button class="btn btn-outline full-width btn-disabled" disabled>
+                Out of Stock
+              </button>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="card empty-state-card">
+    <p class="text-muted empty-state-desc">No produce found matching your filters.</p>
+    <a href="{% url 'customer_browse' %}" class="btn btn-outline mt-2">Reset Filters</a>
+  </div>
+{% endif %}
+{% endblock %}

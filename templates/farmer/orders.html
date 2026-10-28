@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block title %}Incoming Orders - Farmer Portal{% endblock %}
+
+{% block content %}
+<div class="farmer-dashboard-header">
+  <div>
+    <h2>📦 Incoming Customer Pre-Orders</h2>
+    <p class="text-muted">
+      Manage customer orders, prepare produce, and mark ready for collection/delivery
+    </p>
+  </div>
+  <a href="{% url 'farmer_dashboard' %}" class="btn btn-outline btn-sm">← Back to Dashboard</a>
+</div>
+
+{% if orders %}
+  <div class="farmer-orders-list">
+    {% for order in orders %}
+      <div class="card farmer-order-card">
+        <div class="farmer-order-header-row">
+          <div>
+            <div class="farmer-order-title-row">
+              <h3 class="order-card-title">Order #{{ order.order_number }}</h3>
+              <span class="badge 
+                {% if order.order_status == 'placed' %}badge-fruit
+                {% elif order.order_status == 'preparing' %}badge-veg
+                {% elif order.order_status == 'ready' %}badge-instock
+                {% else %}badge-outstock{% endif %}">
+                {{ order.get_order_status_display }}
+              </span>
+            </div>
+            <p class="order-card-meta">
+              Placed on: {{ order.created_at|date:"d M Y, h:i A" }} • Customer: <strong>{{ order.customer.username }}</strong>
+            </p>
+          </div>
+
+          <div class="farmer-order-price-info">
+            <div class="farmer-order-amount">₹{{ order.total_amount }}</div>
+            <small class="text-muted">
+              {{ order.get_payment_method_display }} ({{ order.get_payment_status_display }})
+            </small>
+          </div>
+        </div>
+
+        <!-- Ordered Items from this Farmer -->
+        <div class="farmer-items-section">
+          <h4 class="farmer-items-heading">Harvest Items Ordered:</h4>
+          <ul class="farmer-items-list">
+            {% for item in order.items.all %}
+              {% if item.farmer == user %}
+                <li class="farmer-item-row">
+                  <span>🌿 <strong>{{ item.product_name }}</strong> — {{ item.quantity }} {{ item.unit }}</span>
+                  <span class="fw-bold">₹{{ item.subtotal }} (₹{{ item.price_per_kg }}/{{ item.unit }})</span>
+                </li>
+              {% endif %}
+            {% endfor %}
+          </ul>
+        </div>
+
+        <!-- Delivery & Contact Details -->
+        <div class="delivery-info-box mb-3">
+          <div>📍 <strong>Delivery/Collection Point:</strong> {{ order.delivery_location }} - {{ order.delivery_address }}</div>
+          <div class="mt-1">📞 <strong>Customer Phone:</strong> {{ order.contact_phone }}</div>
+        </div>
+
+        <!-- Order Workflow Actions -->
+        <div class="farmer-order-action-row">
+          {% if order.order_status == 'placed' %}
+            <form method="POST" action="{% url 'update_order_status' order.id %}">
+              {% csrf_token %}
+              <input type="hidden" name="status" value="preparing">
+              <button type="submit" class="btn btn-primary btn-sm">
+                👨‍🌾 Start Preparing Order →
+              </button>
+            </form>
+          {% elif order.order_status == 'preparing' %}
+            <form method="POST" action="{% url 'update_order_status' order.id %}">
+              {% csrf_token %}
+              <input type="hidden" name="status" value="ready">
+              <button type="submit" class="btn btn-success btn-sm">
+                🚚 Mark Ready for Collection / Delivery →
+              </button>
+            </form>
+          {% elif order.order_status == 'ready' %}
+            <form method="POST" action="{% url 'update_order_status' order.id %}">
+              {% csrf_token %}
+              <input type="hidden" name="status" value="delivered">
+              <button type="submit" class="btn btn-outline btn-sm">
+                ✓ Mark Received / Delivered (Complete)
+              </button>
+            </form>
+          {% else %}
+            <span class="completed-text">✓ Order Completed</span>
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="card empty-state-card">
+    <p class="text-muted empty-state-desc">No customer orders received yet.</p>
+    <p class="text-muted text-sm mt-1">
+      When customers near your location place a pre-order, it will appear here for preparation!
+    </p>
+  </div>
+{% endif %}
+{% endblock %}

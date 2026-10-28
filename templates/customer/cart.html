@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block title %}My Cart - FarmConnect{% endblock %}
+
+{% block content %}
+<div class="cart-header">
+  <h2>Your Harvest Pre-Order Cart</h2>
+  <p class="text-muted">
+    Review produce quantities. JavaScript automatically calculates item subtotals and the grand total live.
+  </p>
+</div>
+
+{% if cart_items %}
+  <div class="cart-layout">
+    
+    <!-- Items Table -->
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Harvest Produce</th>
+            <th>Farmer &amp; Location</th>
+            <th>Unit Price</th>
+            <th>Quantity</th>
+            <th>Subtotal</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in cart_items %}
+            <tr class="cart-item-row" 
+                data-item-id="{{ item.id }}" 
+                data-price="{{ item.product.price_per_kg }}" 
+                data-stock="{{ item.product.stock_quantity }}">
+              <td>
+                <div class="cart-product-cell">
+                  <img src="{{ item.product.display_image }}" alt="{{ item.product.name }}" class="table-img-thumb">
+                  <div>
+                    <strong>{{ item.product.name }}</strong>
+                    <br>
+                    <span class="badge {% if item.product.category == 'vegetable' %}badge-veg{% else %}badge-fruit{% endif %} badge-mini">
+                      {{ item.product.get_category_display }}
+                    </span>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <strong>{{ item.product.farmer.username }}</strong><br>
+                <small class="text-muted">{{ item.product.farmer.profile.location|default:"Local Farm" }}</small>
+              </td>
+              <td>₹{{ item.product.price_per_kg }} / {{ item.product.unit }}</td>
+              <td>
+                <div class="qty-control">
+                  <button type="button" class="qty-btn btn-qty-minus">-</button>
+                  <input type="number" 
+                         class="qty-input cart-qty-input" 
+                         value="{{ item.quantity }}" 
+                         min="0.5" 
+                         max="{{ item.product.stock_quantity }}" 
+                         step="0.5">
+                  <button type="button" class="qty-btn btn-qty-plus">+</button>
+                </div>
+                <small class="cart-stock-hint">
+                  Max: {{ item.product.stock_quantity }} {{ item.product.unit }}
+                </small>
+              </td>
+              <td>
+                <strong class="item-subtotal" data-subtotal="{{ item.subtotal }}">
+                  ₹{{ item.subtotal }}
+                </strong>
+              </td>
+              <td class="text-right">
+                <a href="{% url 'remove_from_cart' item.id %}" class="btn btn-outline btn-sm btn-remove-item">
+                  Remove
+                </a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Order Summary Box -->
+    <div class="cart-summary-box">
+      <h3 class="checkout-section-title">
+        Order Summary
+      </h3>
+
+      <div class="cart-summary-row">
+        <span class="text-muted">Total Harvest Items:</span>
+        <span class="fw-bold">{{ cart_items.count }} items</span>
+      </div>
+
+      <div class="cart-summary-row">
+        <span class="text-muted">Delivery / Collection:</span>
+        <span class="text-success fw-bold">FREE (Direct Local)</span>
+      </div>
+
+      <div class="cart-total-section">
+        <div>
+          <span class="cart-total-label">Total Amount:</span>
+          <small class="cart-calc-note">(Calculated via JavaScript)</small>
+        </div>
+        <span id="cart-grand-total" class="cart-grand-total">
+          ₹{{ total_amount }}
+        </span>
+      </div>
+
+      <div class="cart-action-btn">
+        <a href="{% url 'checkout' %}" class="btn btn-primary btn-lg full-width">
+          Choose Payment Method →
+        </a>
+      </div>
+
+      <div class="return-browse-link">
+        <a href="{% url 'customer_browse' %}" class="text-muted text-sm">
+          ← Add More Fresh Harvests
+        </a>
+      </div>
+    </div>
+
+  </div>
+{% else %}
+  <div class="card empty-state-card">
+    <h3>Your cart is empty</h3>
+    <p class="text-muted empty-state-desc">Browse our freshest fruits and vegetables directly from local growers.</p>
+    <a href="{% url 'customer_browse' %}" class="btn btn-primary">Browse Harvest Marketplace</a>
+  </div>
+{% endif %}
+{% endblock %}

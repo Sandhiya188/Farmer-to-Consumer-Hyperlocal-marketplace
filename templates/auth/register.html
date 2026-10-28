@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block title %}User Registration - FarmConnect{% endblock %}
+
+{% block content %}
+<div class="form-card register-card">
+  <div class="auth-card-header">
+    <h2>Create Your Account</h2>
+    <p class="text-muted auth-card-subtitle">
+      Register as a Farmer to sell harvest or as a Customer to buy directly
+    </p>
+  </div>
+
+  <form method="POST" novalidate>
+    {% csrf_token %}
+
+    <!-- Role Selection -->
+    <div class="form-group">
+      <label class="form-label">I want to register as:</label>
+      <div class="role-selector-group">
+        {% for radio in form.role %}
+          <label class="role-selector-card">
+            {{ radio.tag }} {{ radio.choice_label }}
+          </label>
+        {% endfor %}
+      </div>
+      {% if form.role.errors %}
+        <small class="form-error">{{ form.role.errors.0 }}</small>
+      {% endif %}
+    </div>
+
+    <!-- Farm Name (Optional for Farmers) -->
+    <div class="form-group">
+      <label class="form-label">Farm / Estate Name (For Farmers)</label>
+      {{ form.farm_name }}
+    </div>
+
+    <!-- Username & Email -->
+    <div class="form-group">
+      <label class="form-label">Username</label>
+      {{ form.username }}
+      {% if form.username.errors %}
+        <small class="form-error">{{ form.username.errors.0 }}</small>
+      {% endif %}
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Email Address</label>
+      {{ form.email }}
+      {% if form.email.errors %}
+        <small class="form-error">{{ form.email.errors.0 }}</small>
+      {% endif %}
+    </div>
+
+    <!-- Phone Number & Location -->
+    <div class="form-row-2">
+      <div class="form-group">
+        <label class="form-label">Mobile Phone (for OTP)</label>
+        {{ form.phone_number }}
+        {% if form.phone_number.errors %}
+          <small class="form-error">{{ form.phone_number.errors.0 }}</small>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Location / City / Village</label>
+        {{ form.location }}
+        {% if form.location.errors %}
+          <small class="form-error">{{ form.location.errors.0 }}</small>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Full Address / Farm Landmark</label>
+      {{ form.address }}
+    </div>
+
+    <!-- Password & Confirm -->
+    <div class="form-row-2">
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        {{ form.password }}
+        {% if form.password.errors %}
+          <small class="form-error">{{ form.password.errors.0 }}</small>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Confirm Password</label>
+        {{ form.confirm_password }}
+        {% if form.confirm_password.errors %}
+          <small class="form-error">{{ form.confirm_password.errors.0 }}</small>
+        {% endif %}
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-lg full-width mt-2">
+      Complete Registration &amp; Verify OTP
+    </button>
+  </form>
+
+  <div class="auth-card-footer">
+    Already have an account? 
+    <a href="{% url 'login' %}" class="auth-link">Sign In</a>
+  </div>
+</div>
+{% endblock %}

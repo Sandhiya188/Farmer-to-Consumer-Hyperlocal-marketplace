@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Fresh Harvest - Farmer Portal{% endblock %}
+
+{% block content %}
+<div class="form-card farmer-form-card">
+  <div class="farmer-form-header">
+    <h2>🌾 Add Fresh Harvest</h2>
+    <a href="{% url 'farmer_dashboard' %}" class="btn btn-outline btn-sm">← Back to Dashboard</a>
+  </div>
+
+  <p class="text-muted mb-3">
+    List your freshly picked fruits or vegetables. Once submitted, customers can immediately browse and pre-order.
+  </p>
+
+  <form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <div class="form-group">
+      <label class="form-label">Harvest Produce Name</label>
+      {{ form.name }}
+      {% if form.name.errors %}
+        <small class="form-error">{{ form.name.errors.0 }}</small>
+      {% endif %}
+    </div>
+
+    <div class="form-row-2">
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        {{ form.category }}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Measurement Unit</label>
+        {{ form.unit }}
+      </div>
+    </div>
+
+    <div class="form-row-2">
+      <div class="form-group">
+        <label class="form-label">Price per Unit (₹)</label>
+        {{ form.price_per_kg }}
+        {% if form.price_per_kg.errors %}
+          <small class="form-error">{{ form.price_per_kg.errors.0 }}</small>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Available Stock Quantity</label>
+        {{ form.stock_quantity }}
+        {% if form.stock_quantity.errors %}
+          <small class="form-error">{{ form.stock_quantity.errors.0 }}</small>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Date of Harvest</label>
+      {{ form.harvest_date }}
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Description / Freshness Highlights</label>
+      {{ form.description }}
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Harvest Photo (Optional)</label>
+      {{ form.image }}
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-lg full-width mt-2">
+      List Product with Stock ✓
+    </button>
+  </form>
+</div>
+{% endblock %}

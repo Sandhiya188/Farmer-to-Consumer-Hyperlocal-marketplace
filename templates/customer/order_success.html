@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}Order Confirmed - FarmConnect{% endblock %}
+
+{% block content %}
+<div class="order-success-container">
+  <div class="card order-success-card">
+    <div class="order-success-icon">🎉</div>
+    <h1 class="order-success-title">Pre-Order Confirmed!</h1>
+    <p class="order-success-subtitle">
+      Your pre-order <strong>#{{ order.order_number }}</strong> has been verified. Fresh stock has been reserved and deducted.
+    </p>
+
+    <!-- Live Visual Workflow Stepper -->
+    <div class="order-stepper">
+      <div class="step-item completed">
+        <div class="step-circle">✓</div>
+        <div class="step-label">1. Order Placed<br><small class="text-success">Stock Reserved</small></div>
+      </div>
+
+      <div class="step-item {% if order.order_status in 'preparing,ready,delivered' %}completed{% else %}active{% endif %}">
+        <div class="step-circle">👨‍🌾</div>
+        <div class="step-label">2. Farmer Prepares<br><small>Packing Harvest</small></div>
+      </div>
+
+      <div class="step-item {% if order.order_status in 'ready,delivered' %}completed{% elif order.order_status == 'preparing' %}active{% endif %}">
+        <div class="step-circle">🚚</div>
+        <div class="step-label">3. Ready for Delivery<br><small>Collection Point</small></div>
+      </div>
+
+      <div class="step-item {% if order.order_status == 'delivered' %}completed{% endif %}">
+        <div class="step-circle">📦</div>
+        <div class="step-label">4. Customer Receives<br><small>Order Complete</small></div>
+      </div>
+    </div>
+
+    <!-- Order Breakdown Box -->
+    <div class="order-breakdown-box">
+      <h3 class="order-breakdown-title">
+        Order Breakdown
+      </h3>
+
+      <div class="order-breakdown-items">
+        {% for item in order.items.all %}
+          <div class="order-breakdown-row">
+            <span>
+              🌿 <strong>{{ item.product_name }}</strong> ({{ item.quantity }} {{ item.unit }})
+              <small class="text-muted d-block">Farmer: {{ item.farmer.username }}</small>
+            </span>
+            <strong class="item-subtotal-val">₹{{ item.subtotal }}</strong>
+          </div>
+        {% endfor %}
+      </div>
+
+      <div class="order-total-highlight">
+        <span>Total Paid / Payable:</span>
+        <span class="order-total-amount">₹{{ order.total_amount }}</span>
+      </div>
+
+      <div class="order-meta-info">
+        <div><strong>Payment Method:</strong> {{ order.get_payment_method_display }}</div>
+        <div><strong>Payment Status:</strong> {{ order.get_payment_status_display }}</div>
+        <div><strong>Delivery Location:</strong> {{ order.delivery_location }} ({{ order.delivery_address }})</div>
+      </div>
+    </div>
+
+    <div class="order-success-actions">
+      <a href="{% url 'order_detail' order.id %}" class="btn btn-primary">
+        Track Live Order Status →
+      </a>
+      <a href="{% url 'customer_browse' %}" class="btn btn-outline">
+        Browse More Fresh Harvest
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

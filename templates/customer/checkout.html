@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}Checkout &amp; Payment - FarmConnect{% endblock %}
+
+{% block content %}
+<div class="checkout-header">
+  <h2>💳 Choose Payment Method &amp; Complete Pre-Order</h2>
+  <p class="text-muted">Select your delivery details and preferred payment option to confirm your fresh farm harvest order.</p>
+</div>
+
+<form method="POST">
+  {% csrf_token %}
+  
+  <div class="checkout-grid">
+    
+    <div class="checkout-main">
+      <!-- 1. Delivery Details Section -->
+      <div class="card checkout-card">
+        <h3 class="checkout-section-title">📍 1. Delivery / Collection Details</h3>
+        
+        <div class="checkout-form-row">
+          <div class="form-group">
+            <label class="form-label">Delivery Town / City</label>
+            {{ form.delivery_location }}
+            {% if form.delivery_location.errors %}
+              <small class="form-error">{{ form.delivery_location.errors.0 }}</small>
+            {% endif %}
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Contact Phone</label>
+            {{ form.contact_phone }}
+            {% if form.contact_phone.errors %}
+              <small class="form-error">{{ form.contact_phone.errors.0 }}</small>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Full Street Address / Landmark</label>
+          {{ form.delivery_address }}
+          {% if form.delivery_address.errors %}
+            <small class="form-error">{{ form.delivery_address.errors.0 }}</small>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- 2. Payment Method Selection -->
+      <div class="card checkout-card">
+        <h3 class="checkout-section-title">💳 2. Choose Payment Method</h3>
+        
+        <div class="payment-options-list">
+          {% for radio in form.payment_method %}
+            <label class="payment-option-label">
+              {{ radio.tag }}
+              <div>
+                <strong class="payment-option-title">{{ radio.choice_label }}</strong>
+                <span class="payment-option-desc">
+                  {% if radio.data.value == 'cod' %}
+                    Pay directly in cash or UPI to the farmer upon delivery / spot collection.
+                  {% else %}
+                    Instant UPI transfer via Google Pay, PhonePe, Paytm, or BHIM QR code.
+                  {% endif %}
+                </span>
+              </div>
+            </label>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Pre-Order Summary Sidebar -->
+    <div class="checkout-sidebar">
+      <div class="checkout-summary-card">
+        <h3 class="checkout-section-title">Pre-Order Summary</h3>
+
+        <div class="checkout-summary-scroll">
+          {% for item in cart_items %}
+            <div class="checkout-summary-item">
+              <span>{{ item.product.name }} ({{ item.quantity }} {{ item.product.unit }})</span>
+              <strong>₹{{ item.subtotal }}</strong>
+            </div>
+          {% endfor %}
+        </div>
+
+        <div class="checkout-total-row">
+          <span>Final Amount:</span>
+          <span class="checkout-total-price">₹{{ total_amount }}</span>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg full-width">
+          Confirm &amp; Place Pre-Order ✓
+        </button>
+
+        <div class="return-cart-link">
+          <a href="{% url 'cart_view' %}" class="nav-link">
+            ← Return to Cart
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</form>
+{% endblock %}

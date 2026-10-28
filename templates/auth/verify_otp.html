@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Verify OTP - FarmConnect{% endblock %}
+
+{% block content %}
+<div class="form-card otp-card">
+  <h2>Verify Your One-Time Password</h2>
+  <p class="text-muted otp-subtitle">
+    A 6-digit verification code was generated for <strong>{{ user_obj.username }}</strong>
+    {% if profile.phone_number %}({{ profile.phone_number }}){% endif %}.
+  </p>
+
+  {% if demo_otp %}
+    <div class="otp-demo-box">
+      <small class="otp-demo-label">YOUR VERIFICATION CODE</small>
+      <span class="otp-demo-code">{{ demo_otp }}</span>
+    </div>
+  {% endif %}
+
+  <form method="POST">
+    {% csrf_token %}
+    <div class="form-group">
+      {{ form.otp }}
+      {% if form.otp.errors %}
+        <small class="form-error d-block mt-1">{{ form.otp.errors.0 }}</small>
+      {% endif %}
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-lg full-width mt-2">
+      Confirm &amp; Activate Account
+    </button>
+  </form>
+
+  <div class="otp-resend-row">
+    <span>Didn't get the code?</span>
+    <a href="{% url 'resend_otp' %}" class="btn btn-outline btn-sm">Resend OTP</a>
+  </div>
+</div>
+{% endblock %}

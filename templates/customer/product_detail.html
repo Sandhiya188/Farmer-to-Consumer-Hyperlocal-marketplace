@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ product.name }} - Fresh Harvest Pre-Order{% endblock %}
+
+{% block content %}
+<div class="product-detail-container">
+  <div class="mb-3">
+    <a href="{% url 'customer_browse' %}" class="btn btn-outline btn-sm">← Back to Marketplace</a>
+  </div>
+
+  <div class="card product-detail-grid">
+    <!-- Real Photograph Display -->
+    <div class="product-detail-img-box">
+      <img src="{{ product.display_image }}" alt="{{ product.name }}">
+    </div>
+
+    <!-- Product & Pre-Order Form -->
+    <div class="product-detail-info">
+      <div class="product-badges-row">
+        <span class="badge {% if product.category == 'vegetable' %}badge-veg{% else %}badge-fruit{% endif %}">
+          {{ product.get_category_display }}
+        </span>
+        {% if product.stock_quantity > 0 %}
+          <span class="badge badge-instock">Stock Available ({{ product.stock_quantity }} {{ product.unit }})</span>
+        {% else %}
+          <span class="badge badge-outstock">Out of Stock</span>
+        {% endif %}
+      </div>
+
+      <h1 class="product-title">{{ product.name }}</h1>
+
+      <div class="product-farmer-card">
+        <div class="product-farmer-row">Farmer: <strong>{{ product.farmer.username }}</strong></div>
+        <div class="product-farmer-row">Farm Location: <strong>{{ product.farmer.profile.location|default:"Nearby" }}</strong></div>
+        <div class="product-farmer-row">Harvest Date: <strong>{{ product.harvest_date|date:"F d, Y" }}</strong></div>
+      </div>
+
+      {% if product.description %}
+        <p class="product-desc">
+          {{ product.description }}
+        </p>
+      {% endif %}
+
+      <div class="product-price-display">
+        <span class="text-muted">Unit Price:</span>
+        <div id="detail-unit-price" data-price="{{ product.price_per_kg }}" class="product-price-amount">
+          ₹{{ product.price_per_kg }} <span class="product-price-unit">/ {{ product.unit }}</span>
+        </div>
+      </div>
+
+      {% if product.stock_quantity > 0 %}
+        <form method="POST" action="{% url 'add_to_cart' product.id %}" class="product-form-box">
+          {% csrf_token %}
+          
+          <div class="form-group">
+            <label class="form-label">Select Quantity (in {{ product.unit }}):</label>
+            <div class="product-qty-row">
+              <input 
+                type="number" 
+                id="detail-quantity-input" 
+                name="quantity" 
+                value="1" 
+                min="0.5" 
+                max="{{ product.stock_quantity }}" 
+                step="0.5" 
+                class="form-input product-qty-input"
+              >
+              <span class="text-muted">Max: {{ product.stock_quantity }} {{ product.unit }}</span>
+            </div>
+          </div>
+
+          <!-- Live Subtotal Calculation -->
+          <div class="product-subtotal-row">
+            <span class="text-muted fw-bold">Total Calculated:</span>
+            <span id="detail-total-display" class="product-subtotal-amount">₹{{ product.price_per_kg }}</span>
+          </div>
+
+          <button type="submit" class="btn btn-primary full-width">
+            Add to Cart &amp; Continue →
+          </button>
+        </form>
+      {% else %}
+        <div class="alert alert-error mt-2">
+          This harvest produce is currently Out of Stock.
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
