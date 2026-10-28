@@ -1311,6 +1311,28 @@ footer a {
   color: var(--text-main);
 }
 .role-selector-card:hover { border-color: var(--primary); background: var(--primary-light); }
+.role-selector-card:has(input:checked),
+.role-selector-card.active {
+  border-color: var(--primary);
+  background: var(--primary-light);
+  box-shadow: 0 0 0 1.5px var(--primary);
+}
+.role-card-label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.role-specific-section {
+  background: var(--bg-main);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+  transition: var(--transition);
+}
+.form-section-banner {
+  margin-bottom: 1rem;
+}
 
 /* OTP Components */
 .otp-card { max-width: 480px; text-align: center; }

@@ -13,6 +13,7 @@ import razorpay
 
 from .models import UserProfile, Product, CartItem, Order, OrderItem
 from .forms import UserRegistrationForm, OTPVerificationForm, ProductForm, CheckoutForm
+from .sms_service import send_otp_sms
 
 
 def get_user_profile(user):
@@ -63,7 +64,7 @@ def home_view(request):
 
 
 def register_view(request):
-    """User registration step for both Farmers and Customers with OTP trigger"""
+    """User registration step for both Farmers and Customers with secure OTP SMS trigger"""
     if request.user.is_authenticated:
         return redirect('home')
 
@@ -72,38 +73,59 @@ def register_view(request):
         if form.is_valid():
             user = form.save(commit=False)
             user.set_password(form.cleaned_data['password'])
+            user.first_name = form.cleaned_data.get('full_name', '')
             user.save()
 
             role = form.cleaned_data['role']
             profile, _ = UserProfile.objects.get_or_create(user=user)
             profile.role = role
-            profile.farm_name = form.cleaned_data.get('farm_name', '')
             profile.phone_number = form.cleaned_data.get('phone_number', '')
-            profile.location = form.cleaned_data.get('location', '')
-            profile.address = form.cleaned_data.get('address', '')
+            profile.district = form.cleaned_data.get('district', '')
+
+            if role == 'farmer':
+                profile.farm_name = form.cleaned_data.get('farm_name', '')
+                profile.location = form.cleaned_data.get('farm_location', '')
+                profile.address = form.cleaned_data.get('farm_address', '')
+            else:  # customer
+                profile.farm_name = ''
+                city_town = form.cleaned_data.get('city_town')
+                profile.location = city_town if city_town else form.cleaned_data.get('district', '')
+                profile.address = form.cleaned_data.get('delivery_address', '')
+
             profile.is_verified = False
             profile.save()
 
-            # Generate OTP for verification
-            otp = profile.generate_otp()
-            request.session['pending_user_id'] = user.id
+            # Generate and dispatch secure 6-digit OTP via SMS
+            otp = profile.generate_otp(is_resend=False)
+            sms_success, sms_msg, provider_configured = send_otp_sms(profile.phone_number, otp)
 
-            # In development, surface the OTP in message for easy testing
-            messages.info(
-                request,
-                f"🌱 Welcome! An OTP has been sent to {profile.phone_number or user.email}. "
-                f"Test Verification Code: {otp}"
-            )
+            request.session['pending_user_id'] = user.id
+            request.session['sms_provider_configured'] = provider_configured
+
+            if provider_configured and sms_success:
+                masked = f"+91 ••••• •{profile.phone_number[-4:]}" if len(profile.phone_number) >= 4 else profile.phone_number
+                messages.success(request, f"🌱 Registration details submitted! A 6-digit OTP code has been dispatched via SMS to {masked}.")
+            elif not provider_configured:
+                messages.warning(
+                    request,
+                    "⚠️ SMS Provider (Twilio) is not configured in .env. Real SMS could not be sent. "
+                    "For development testing, check your server terminal console for the verification code."
+                )
+            else:
+                messages.warning(request, f"⚠️ SMS could not be delivered: {sms_msg}")
+
             return redirect('verify_otp')
     else:
         initial_role = request.GET.get('role', 'customer')
+        if initial_role not in ['farmer', 'customer']:
+            initial_role = 'customer'
         form = UserRegistrationForm(initial={'role': initial_role})
 
     return render(request, 'auth/register.html', {'form': form})
 
 
 def verify_otp_view(request):
-    """OTP Verification step before activating account"""
+    """Secure OTP Verification step before activating user account (No on-screen OTP code)"""
     user_id = request.session.get('pending_user_id')
     if not user_id:
         messages.warning(request, "Session expired or invalid. Please sign up or log in.")
@@ -116,28 +138,42 @@ def verify_otp_view(request):
         form = OTPVerificationForm(request.POST)
         if form.is_valid():
             entered_otp = form.cleaned_data['otp']
-            if profile.verify_otp(entered_otp):
+            is_valid, verify_msg = profile.verify_otp(entered_otp)
+
+            if is_valid:
                 del request.session['pending_user_id']
+                request.session.pop('sms_provider_configured', None)
                 login(request, user)
-                messages.success(request, f"🎉 Verification successful! Welcome to FarmConnect, {user.username}.")
+                display_name = user.first_name or user.username
+                messages.success(request, f"🎉 Verification successful! Welcome to FarmConnect, {display_name}.")
+
+                # Redirect to appropriate role dashboard
                 if profile.role == 'farmer':
                     return redirect('farmer_dashboard')
                 return redirect('customer_browse')
             else:
-                messages.error(request, "❌ Invalid or expired OTP. Please check and try again.")
+                messages.error(request, f"❌ {verify_msg}")
     else:
         form = OTPVerificationForm()
+
+    masked_phone = ''
+    if profile.phone_number:
+        raw = profile.phone_number
+        masked_phone = f"+91 ••••• •{raw[-4:]}" if len(raw) >= 4 else raw
+
+    provider_configured = request.session.get('sms_provider_configured', True)
 
     return render(request, 'auth/verify_otp.html', {
         'form': form,
         'user_obj': user,
         'profile': profile,
-        'demo_otp': profile.otp  # Show on screen for immediate testing
+        'masked_phone': masked_phone,
+        'provider_configured': provider_configured,
     })
 
 
 def resend_otp_view(request):
-    """Resend a fresh OTP to the pending user"""
+    """Resend a fresh OTP with rate-limiting, cooldown, and carrier SMS dispatch"""
     user_id = request.session.get('pending_user_id')
     if not user_id:
         messages.error(request, "Session expired. Please register again.")
@@ -145,13 +181,32 @@ def resend_otp_view(request):
 
     user = get_object_or_404(User, id=user_id)
     profile = get_user_profile(user)
-    new_otp = profile.generate_otp()
-    messages.info(request, f"🔄 New OTP generated: {new_otp}")
+
+    can_resend, reason = profile.can_resend_otp()
+    if not can_resend:
+        messages.warning(request, f"⏳ {reason}")
+        return redirect('verify_otp')
+
+    new_otp = profile.generate_otp(is_resend=True)
+    sms_success, sms_msg, provider_configured = send_otp_sms(profile.phone_number, new_otp)
+    request.session['sms_provider_configured'] = provider_configured
+
+    if provider_configured and sms_success:
+        messages.success(request, "📲 A new 6-digit verification code has been dispatched via SMS to your phone.")
+    elif not provider_configured:
+        messages.warning(
+            request,
+            "⚠️ SMS Provider (Twilio) is not configured in .env. "
+            "For development testing, check your server terminal console for the new OTP."
+        )
+    else:
+        messages.warning(request, f"⚠️ SMS could not be dispatched: {sms_msg}")
+
     return redirect('verify_otp')
 
 
 def login_view(request):
-    """User Login for both Farmer and Customer"""
+    """User Login for both Farmer and Customer with role-based dashboard redirects"""
     if request.user.is_authenticated:
         return redirect('home')
 
@@ -161,15 +216,28 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
 
         if user is not None:
-            login(request, user)
             profile = get_user_profile(user)
+
             if profile and not profile.is_verified:
-                profile.generate_otp()
+                can_resend, _ = profile.can_resend_otp()
+                if can_resend:
+                    otp = profile.generate_otp(is_resend=False)
+                    _, _, provider_configured = send_otp_sms(profile.phone_number, otp)
+                    request.session['sms_provider_configured'] = provider_configured
+
                 request.session['pending_user_id'] = user.id
-                messages.warning(request, f"Please verify your account OTP. Demo Code: {profile.otp}")
+                messages.warning(request, "Please verify your account phone number using the OTP.")
                 return redirect('verify_otp')
 
-            messages.success(request, f"Welcome back, {user.username}!")
+            login(request, user)
+            display_name = user.first_name or user.username
+            messages.success(request, f"Welcome back, {display_name}!")
+
+            next_url = request.GET.get('next') or request.POST.get('next')
+            if next_url and next_url.startswith('/'):
+                return redirect(next_url)
+
+            # Redirect each user to the correct dashboard based on their role
             if profile and profile.role == 'farmer':
                 return redirect('farmer_dashboard')
             return redirect('customer_browse')

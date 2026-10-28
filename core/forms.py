@@ -9,9 +9,24 @@ class UserRegistrationForm(forms.ModelForm):
         ('customer', 'Customer (Buy Directly from Local Farmers)'),
     ]
 
-    farm_name = forms.CharField(
-        required=False,
-        widget=forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Farm / Estate Name (For Farmers)'})
+    role = forms.ChoiceField(
+        choices=ROLE_CHOICES,
+        widget=forms.RadioSelect(attrs={'class': 'role-radio-input'})
+    )
+    full_name = forms.CharField(
+        max_length=100,
+        required=True,
+        widget=forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Full Name (e.g. Ramesh Kumar)'})
+    )
+    phone_number = forms.CharField(
+        max_length=15,
+        required=True,
+        widget=forms.TextInput(attrs={'class': 'form-input', 'placeholder': '10-digit Mobile Phone Number'})
+    )
+    district = forms.CharField(
+        max_length=100,
+        required=True,
+        widget=forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'District (e.g. Coimbatore, Madurai, Salem)'})
     )
     password = forms.CharField(
         widget=forms.PasswordInput(attrs={'class': 'form-input', 'placeholder': 'Create strong password'}),
@@ -20,31 +35,49 @@ class UserRegistrationForm(forms.ModelForm):
     confirm_password = forms.CharField(
         widget=forms.PasswordInput(attrs={'class': 'form-input', 'placeholder': 'Repeat your password'})
     )
-    role = forms.ChoiceField(
-        choices=ROLE_CHOICES,
-        widget=forms.RadioSelect(attrs={'class': 'role-radio-input'})
+
+    # Farmer-specific details
+    farm_name = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Farm / Estate Name (e.g. Green Valley Farm)'})
     )
-    phone_number = forms.CharField(
-        max_length=15,
-        widget=forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Mobile Phone Number'})
+    farm_location = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Farm Village / Area (e.g. Pollachi Village)'})
+    )
+    farm_address = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={'class': 'form-input', 'rows': 2, 'placeholder': 'Detailed Farm Landmark / Street Address'})
     )
 
-    location = forms.CharField(
-        max_length=100,
-        widget=forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'City / Village (e.g. Nashik, Pune)'})
-    )
-    address = forms.CharField(
+    # Customer-specific details
+    delivery_address = forms.CharField(
         required=False,
-        widget=forms.Textarea(attrs={'class': 'form-input', 'rows': 2, 'placeholder': 'Farm landmark / Home address'})
+        widget=forms.Textarea(attrs={'class': 'form-input', 'rows': 2, 'placeholder': 'House/Flat No, Street, Landmark for Delivery'})
+    )
+    city_town = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'City / Town / Area (Optional)'})
     )
 
     class Meta:
         model = User
         fields = ['username', 'email']
         widgets = {
-            'username': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Choose username'}),
+            'username': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Choose unique username'}),
             'email': forms.EmailInput(attrs={'class': 'form-input', 'placeholder': 'your.email@example.com'}),
         }
+
+    def clean_phone_number(self):
+        raw_phone = self.cleaned_data.get('phone_number', '').strip()
+        clean = raw_phone.replace(' ', '').replace('-', '').replace('(', '').replace(')', '')
+        if clean.startswith('+91'):
+            clean = clean[3:]
+        elif clean.startswith('0'):
+            clean = clean[1:]
+        if not clean.isdigit() or len(clean) != 10:
+            raise forms.ValidationError("Please enter a valid 10-digit Indian mobile number.")
+        return clean
 
     def clean(self):
         cleaned_data = super().clean()
@@ -52,6 +85,21 @@ class UserRegistrationForm(forms.ModelForm):
         confirm_password = cleaned_data.get('confirm_password')
         if password and confirm_password and password != confirm_password:
             self.add_error('confirm_password', "Passwords do not match!")
+
+        role = cleaned_data.get('role')
+        if role == 'farmer':
+            if not cleaned_data.get('farm_name'):
+                self.add_error('farm_name', "Farm Name is required for Farmer registration.")
+            if not cleaned_data.get('farm_location'):
+                self.add_error('farm_location', "Farm Location / Village is required for Farmers.")
+            if not cleaned_data.get('district'):
+                self.add_error('district', "District is required.")
+        elif role == 'customer':
+            if not cleaned_data.get('delivery_address'):
+                self.add_error('delivery_address', "Delivery Address is required for Customer registration.")
+            if not cleaned_data.get('district'):
+                self.add_error('district', "District is required.")
+
         return cleaned_data
 
 
@@ -67,6 +115,12 @@ class OTPVerificationForm(forms.Form):
             'style': 'letter-spacing: 0.35rem; font-size: 1.5rem; text-align: center;'
         })
     )
+
+    def clean_otp(self):
+        val = self.cleaned_data.get('otp', '').strip()
+        if not val.isdigit() or len(val) != 6:
+            raise forms.ValidationError("OTP must be exactly 6 numeric digits.")
+        return val
 
 
 class ProductForm(forms.ModelForm):

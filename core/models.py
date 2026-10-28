@@ -17,32 +17,87 @@ class UserProfile(models.Model):
     farm_name = models.CharField(max_length=150, blank=True, help_text="Farm / Estate Name")
     phone_number = models.CharField(max_length=15, blank=True)
     location = models.CharField(max_length=100, help_text="Region / City / Village")
+    district = models.CharField(max_length=100, blank=True, default='', help_text="District")
     address = models.TextField(blank=True, help_text="Full address or farm landmark")
     latitude = models.FloatField(default=18.5204, help_text="GPS Latitude for Map Pin")
     longitude = models.FloatField(default=73.8567, help_text="GPS Longitude for Map Pin")
     is_verified = models.BooleanField(default=False)
     otp = models.CharField(max_length=6, blank=True, null=True)
     otp_created_at = models.DateTimeField(null=True, blank=True)
+    otp_attempts = models.IntegerField(default=0, help_text="Failed verification attempts")
+    otp_resend_count = models.IntegerField(default=0, help_text="Number of resends in current window")
+    otp_last_sent_at = models.DateTimeField(null=True, blank=True, help_text="Last OTP dispatch timestamp")
 
-    def generate_otp(self):
+    def can_resend_otp(self):
+        """
+        Enforces OTP resend rate-limiting and abuse protection:
+        - 60-second cooldown between consecutive requests
+        - Maximum 3 resends per 15-minute window
+        """
+        now = timezone.now()
+        if self.otp_last_sent_at:
+            elapsed = (now - self.otp_last_sent_at).total_seconds()
+            if elapsed < 60:
+                wait_sec = int(60 - elapsed)
+                return False, f"Please wait {wait_sec} seconds before requesting a new OTP."
+
+            # Reset resend count if 15 minutes have passed
+            if elapsed > 900:
+                self.otp_resend_count = 0
+                self.save(update_fields=['otp_resend_count'])
+
+        if self.otp_resend_count >= 3:
+            return False, "Maximum resend limit reached (3 resends). Please try again after 15 minutes."
+
+        return True, ""
+
+    def generate_otp(self, is_resend=False):
+        """Generates a secure 6-digit OTP code and updates audit timestamps"""
         new_otp = f"{random.randint(100000, 999999)}"
+        now = timezone.now()
         self.otp = new_otp
-        self.otp_created_at = timezone.now()
-        self.save(update_fields=['otp', 'otp_created_at'])
+        self.otp_created_at = now
+        self.otp_last_sent_at = now
+        self.otp_attempts = 0
+        if is_resend:
+            self.otp_resend_count += 1
+        else:
+            self.otp_resend_count = 0
+
+        self.save(update_fields=['otp', 'otp_created_at', 'otp_last_sent_at', 'otp_attempts', 'otp_resend_count'])
         return new_otp
 
     def verify_otp(self, entered_otp):
+        """
+        Verifies entered OTP against stored hash/code with strict expiry & abuse limits.
+        Returns tuple: (is_valid: bool, message: str)
+        """
         if not self.otp or not self.otp_created_at:
-            return False
-        expiry_time = self.otp_created_at + timezone.timedelta(minutes=10)
+            return False, "No active OTP found. Please request a new verification code."
+
+        # Abuse protection: max 5 failed attempts
+        if self.otp_attempts >= 5:
+            return False, "Maximum verification attempts exceeded (5/5). Please request a fresh OTP."
+
+        # Expiry check: 5 minutes
+        expiry_time = self.otp_created_at + timezone.timedelta(minutes=5)
         if timezone.now() > expiry_time:
-            return False
+            return False, "OTP has expired (valid for 5 minutes). Please click 'Resend OTP'."
+
         if str(self.otp).strip() == str(entered_otp).strip():
             self.is_verified = True
             self.otp = None
-            self.save(update_fields=['is_verified', 'otp'])
-            return True
-        return False
+            self.otp_attempts = 0
+            self.otp_resend_count = 0
+            self.save(update_fields=['is_verified', 'otp', 'otp_attempts', 'otp_resend_count'])
+            return True, "Phone number verified successfully!"
+
+        self.otp_attempts += 1
+        self.save(update_fields=['otp_attempts'])
+        remaining = 5 - self.otp_attempts
+        if remaining <= 0:
+            return False, "Maximum verification attempts exceeded. Please request a new OTP."
+        return False, f"Incorrect verification code. {remaining} attempt(s) remaining."
 
     def __str__(self):
         return f"{self.user.username} ({self.get_role_display()} - {self.location})"
@@ -177,6 +232,7 @@ def ensure_user_profile(sender, instance, created, **kwargs):
             defaults={
                 'role': 'farmer' if (instance.is_staff or instance.is_superuser) else 'customer',
                 'location': 'Tamil Nadu',
+                'district': 'Tamil Nadu',
                 'is_verified': True if instance.is_superuser else False,
             }
         )

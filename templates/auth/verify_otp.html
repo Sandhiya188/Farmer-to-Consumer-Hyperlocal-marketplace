@@ -1,29 +1,45 @@
 {% extends 'base.html' %}
 
-{% block title %}Verify OTP - FarmConnect{% endblock %}
+{% block title %}Verify Phone OTP - FarmConnect{% endblock %}
 
 {% block content %}
 <div class="form-card otp-card">
-  <h2>Verify Your One-Time Password</h2>
+  <h2>Verify Your Mobile Number</h2>
   <p class="text-muted otp-subtitle">
-    A 6-digit verification code was generated for <strong>{{ user_obj.username }}</strong>
-    {% if profile.phone_number %}({{ profile.phone_number }}){% endif %}.
+    A secure 6-digit verification code has been generated for 
+    <strong>{{ user_obj.first_name|default:user_obj.username }}</strong>
+    {% if masked_phone %}
+      at <strong>{{ masked_phone }}</strong>
+    {% endif %}.
   </p>
 
-  {% if demo_otp %}
-    <div class="otp-demo-box">
-      <small class="otp-demo-label">YOUR VERIFICATION CODE</small>
-      <span class="otp-demo-code">{{ demo_otp }}</span>
+  {% if not provider_configured %}
+    <div class="alert alert-warning text-left mb-3" style="text-align: left; font-size: 0.9rem;">
+      <strong>⚠️ Carrier SMS Gateway Notice:</strong><br>
+      Twilio credentials (<code style="font-size: 0.85rem;">TWILIO_ACCOUNT_SID</code>, <code style="font-size: 0.85rem;">TWILIO_AUTH_TOKEN</code>, <code style="font-size: 0.85rem;">TWILIO_PHONE_NUMBER</code>) are not configured in your <code>.env</code> file. 
+      Real carrier SMS could not be sent to your phone.
+      <br><br>
+      <strong>Testing Locally:</strong> Check your <strong>Django server terminal / console</strong> to view the dispatched verification code.
+    </div>
+  {% else %}
+    <div class="alert alert-info text-left mb-3" style="text-align: left; font-size: 0.9rem;">
+      <strong>📲 SMS Sent:</strong> Please check your mobile phone for an SMS containing your 6-digit code. The code expires in <strong>5 minutes</strong>.
     </div>
   {% endif %}
 
-  <form method="POST">
+  <form method="POST" novalidate>
     {% csrf_token %}
     <div class="form-group">
+      <label class="form-label fw-bold" for="{{ form.otp.id_for_label }}">
+        Enter 6-Digit Verification Code
+      </label>
       {{ form.otp }}
       {% if form.otp.errors %}
         <small class="form-error d-block mt-1">{{ form.otp.errors.0 }}</small>
       {% endif %}
+      <small class="text-muted d-block mt-1">
+        Code expires in 5 minutes • Maximum 5 verification attempts allowed.
+      </small>
     </div>
 
     <button type="submit" class="btn btn-primary btn-lg full-width mt-2">
@@ -32,8 +48,10 @@
   </form>
 
   <div class="otp-resend-row">
-    <span>Didn't get the code?</span>
-    <a href="{% url 'resend_otp' %}" class="btn btn-outline btn-sm">Resend OTP</a>
+    <span>Didn't receive the SMS?</span>
+    <a href="{% url 'resend_otp' %}" class="btn btn-outline btn-sm" id="btn-resend-otp">
+      Resend SMS OTP
+    </a>
   </div>
 </div>
 {% endblock %}

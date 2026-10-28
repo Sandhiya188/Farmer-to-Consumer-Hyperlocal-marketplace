@@ -1,26 +1,35 @@
 {% extends 'base.html' %}
 
-{% block title %}User Registration - FarmConnect{% endblock %}
+{% block title %}Create Account - FarmConnect{% endblock %}
 
 {% block content %}
 <div class="form-card register-card">
   <div class="auth-card-header">
-    <h2>Create Your Account</h2>
-    <p class="text-muted auth-card-subtitle">
-      Register as a Farmer to sell harvest or as a Customer to buy directly
+    <h2 id="register-heading">Join FarmConnect</h2>
+    <p class="text-muted auth-card-subtitle" id="register-subheading">
+      Choose whether you are registering as a Local Farmer or Fresh Produce Customer.
     </p>
   </div>
 
-  <form method="POST" novalidate>
+  <form method="POST" novalidate id="registration-form">
     {% csrf_token %}
 
-    <!-- Role Selection -->
+    <!-- Role Selection Cards -->
     <div class="form-group">
-      <label class="form-label">I want to register as:</label>
+      <label class="form-label fw-bold">Select Account Type:</label>
       <div class="role-selector-group">
         {% for radio in form.role %}
-          <label class="role-selector-card">
-            {{ radio.tag }} {{ radio.choice_label }}
+          <label class="role-selector-card {% if radio.data.selected %}active{% endif %}" id="card-role-{{ radio.data.value }}">
+            {{ radio.tag }}
+            <span class="role-card-label">
+              {% if radio.data.value == 'farmer' %}
+                👨‍🌾 <strong>Join as Farmer</strong>
+                <small class="d-block text-muted text-sm">Sell freshly harvested crops directly</small>
+              {% else %}
+                🛒 <strong>Join as Customer</strong>
+                <small class="d-block text-muted text-sm">Pre-order produce directly from growers</small>
+              {% endif %}
+            </span>
           </label>
         {% endfor %}
       </div>
@@ -29,57 +38,113 @@
       {% endif %}
     </div>
 
-    <!-- Farm Name (Optional for Farmers) -->
-    <div class="form-group">
-      <label class="form-label">Farm / Estate Name (For Farmers)</label>
-      {{ form.farm_name }}
-    </div>
-
-    <!-- Username & Email -->
-    <div class="form-group">
-      <label class="form-label">Username</label>
-      {{ form.username }}
-      {% if form.username.errors %}
-        <small class="form-error">{{ form.username.errors.0 }}</small>
-      {% endif %}
-    </div>
-
-    <div class="form-group">
-      <label class="form-label">Email Address</label>
-      {{ form.email }}
-      {% if form.email.errors %}
-        <small class="form-error">{{ form.email.errors.0 }}</small>
-      {% endif %}
-    </div>
-
-    <!-- Phone Number & Location -->
+    <!-- COMMON DETAILS: Full Name & Username -->
     <div class="form-row-2">
       <div class="form-group">
-        <label class="form-label">Mobile Phone (for OTP)</label>
+        <label class="form-label" for="{{ form.full_name.id_for_label }}">Full Name *</label>
+        {{ form.full_name }}
+        {% if form.full_name.errors %}
+          <small class="form-error">{{ form.full_name.errors.0 }}</small>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="{{ form.username.id_for_label }}">Username *</label>
+        {{ form.username }}
+        {% if form.username.errors %}
+          <small class="form-error">{{ form.username.errors.0 }}</small>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- COMMON DETAILS: Email & Mobile Phone -->
+    <div class="form-row-2">
+      <div class="form-group">
+        <label class="form-label" for="{{ form.email.id_for_label }}">Email Address *</label>
+        {{ form.email }}
+        {% if form.email.errors %}
+          <small class="form-error">{{ form.email.errors.0 }}</small>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="{{ form.phone_number.id_for_label }}">Mobile Phone Number (for SMS OTP) *</label>
         {{ form.phone_number }}
         {% if form.phone_number.errors %}
           <small class="form-error">{{ form.phone_number.errors.0 }}</small>
         {% endif %}
       </div>
+    </div>
+
+    <!-- COMMON DETAILS: District -->
+    <div class="form-group">
+      <label class="form-label" for="{{ form.district.id_for_label }}">District *</label>
+      {{ form.district }}
+      {% if form.district.errors %}
+        <small class="form-error">{{ form.district.errors.0 }}</small>
+      {% endif %}
+    </div>
+
+    <!-- ================= FARMER-SPECIFIC DETAILS ================= -->
+    <div id="farmer-fields-section" class="role-specific-section">
+      <div class="form-section-banner">
+        <span class="badge badge-veg">Farmer Profile Details</span>
+      </div>
+
+      <div class="form-row-2">
+        <div class="form-group">
+          <label class="form-label" for="{{ form.farm_name.id_for_label }}">Farm / Estate Name *</label>
+          {{ form.farm_name }}
+          {% if form.farm_name.errors %}
+            <small class="form-error">{{ form.farm_name.errors.0 }}</small>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="{{ form.farm_location.id_for_label }}">Farm Location / Village *</label>
+          {{ form.farm_location }}
+          {% if form.farm_location.errors %}
+            <small class="form-error">{{ form.farm_location.errors.0 }}</small>
+          {% endif %}
+        </div>
+      </div>
 
       <div class="form-group">
-        <label class="form-label">Location / City / Village</label>
-        {{ form.location }}
-        {% if form.location.errors %}
-          <small class="form-error">{{ form.location.errors.0 }}</small>
+        <label class="form-label" for="{{ form.farm_address.id_for_label }}">Farm Landmark &amp; Street Address</label>
+        {{ form.farm_address }}
+        {% if form.farm_address.errors %}
+          <small class="form-error">{{ form.farm_address.errors.0 }}</small>
         {% endif %}
       </div>
     </div>
 
-    <div class="form-group">
-      <label class="form-label">Full Address / Farm Landmark</label>
-      {{ form.address }}
+    <!-- ================= CUSTOMER-SPECIFIC DETAILS ================= -->
+    <div id="customer-fields-section" class="role-specific-section">
+      <div class="form-section-banner">
+        <span class="badge badge-fruit">Customer Delivery Details</span>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="{{ form.delivery_address.id_for_label }}">Delivery Address *</label>
+        {{ form.delivery_address }}
+        {% if form.delivery_address.errors %}
+          <small class="form-error">{{ form.delivery_address.errors.0 }}</small>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="{{ form.city_town.id_for_label }}">City / Town / Area (Optional)</label>
+        {{ form.city_town }}
+        {% if form.city_town.errors %}
+          <small class="form-error">{{ form.city_town.errors.0 }}</small>
+        {% endif %}
+      </div>
     </div>
 
-    <!-- Password & Confirm -->
+    <!-- COMMON DETAILS: Password & Confirm Password -->
     <div class="form-row-2">
       <div class="form-group">
-        <label class="form-label">Password</label>
+        <label class="form-label" for="{{ form.password.id_for_label }}">Password *</label>
         {{ form.password }}
         {% if form.password.errors %}
           <small class="form-error">{{ form.password.errors.0 }}</small>
@@ -87,7 +152,7 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label">Confirm Password</label>
+        <label class="form-label" for="{{ form.confirm_password.id_for_label }}">Confirm Password *</label>
         {{ form.confirm_password }}
         {% if form.confirm_password.errors %}
           <small class="form-error">{{ form.confirm_password.errors.0 }}</small>
@@ -95,8 +160,8 @@
       </div>
     </div>
 
-    <button type="submit" class="btn btn-primary btn-lg full-width mt-2">
-      Complete Registration &amp; Verify OTP
+    <button type="submit" id="submit-register-btn" class="btn btn-primary btn-lg full-width mt-2">
+      Complete Registration &amp; Send SMS OTP
     </button>
   </form>
 
@@ -105,4 +170,59 @@
     <a href="{% url 'login' %}" class="auth-link">Sign In</a>
   </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  (function () {
+    const roleRadios = document.querySelectorAll('input[name="role"]');
+    const farmerSection = document.getElementById('farmer-fields-section');
+    const customerSection = document.getElementById('customer-fields-section');
+    const submitBtn = document.getElementById('submit-register-btn');
+    const roleCards = document.querySelectorAll('.role-selector-card');
+
+    function syncRoleFields(selectedRole) {
+      // Update card active classes
+      roleCards.forEach(card => card.classList.remove('active'));
+      const activeRadio = document.querySelector(`input[name="role"][value="${selectedRole}"]`);
+      if (activeRadio) {
+        const parentCard = activeRadio.closest('.role-selector-card');
+        if (parentCard) parentCard.classList.add('active');
+      }
+
+      if (selectedRole === 'farmer') {
+        if (farmerSection) farmerSection.style.display = 'block';
+        if (customerSection) customerSection.style.display = 'none';
+        if (submitBtn) submitBtn.innerText = 'Register as Farmer & Verify via SMS OTP';
+      } else {
+        if (farmerSection) farmerSection.style.display = 'none';
+        if (customerSection) customerSection.style.display = 'block';
+        if (submitBtn) submitBtn.innerText = 'Register as Customer & Verify via SMS OTP';
+      }
+    }
+
+    roleRadios.forEach(radio => {
+      radio.addEventListener('change', function () {
+        syncRoleFields(this.value);
+      });
+    });
+
+    // Check pre-selected or initial role
+    let currentRole = 'customer';
+    const checkedRadio = document.querySelector('input[name="role"]:checked');
+    if (checkedRadio) {
+      currentRole = checkedRadio.value;
+    } else {
+      // Check query parameter
+      const urlParams = new URLSearchParams(window.location.search);
+      const queryRole = urlParams.get('role');
+      if (queryRole === 'farmer' || queryRole === 'customer') {
+        currentRole = queryRole;
+        const targetRadio = document.querySelector(`input[name="role"][value="${queryRole}"]`);
+        if (targetRadio) targetRadio.checked = true;
+      }
+    }
+    syncRoleFields(currentRole);
+  })();
+</script>
 {% endblock %}
