@@ -161,7 +161,7 @@
     </div>
 
     <button type="submit" id="submit-register-btn" class="btn btn-primary btn-lg full-width mt-2">
-      Complete Registration &amp; Send SMS OTP
+      Complete Registration &amp; Get Verification Code
     </button>
   </form>
 
@@ -193,11 +193,11 @@
       if (selectedRole === 'farmer') {
         if (farmerSection) farmerSection.style.display = 'block';
         if (customerSection) customerSection.style.display = 'none';
-        if (submitBtn) submitBtn.innerText = 'Register as Farmer & Verify via SMS OTP';
+        if (submitBtn) submitBtn.innerText = 'Register as Farmer & Activate Account';
       } else {
         if (farmerSection) farmerSection.style.display = 'none';
         if (customerSection) customerSection.style.display = 'block';
-        if (submitBtn) submitBtn.innerText = 'Register as Customer & Verify via SMS OTP';
+        if (submitBtn) submitBtn.innerText = 'Register as Customer & Activate Account';
       }
     }
 

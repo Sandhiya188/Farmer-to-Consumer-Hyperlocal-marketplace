@@ -95,25 +95,14 @@ def register_view(request):
             profile.is_verified = False
             profile.save()
 
-            # Generate and dispatch secure 6-digit OTP via SMS
+            # Generate 6-digit OTP to be verified directly on screen
             otp = profile.generate_otp(is_resend=False)
-            sms_success, sms_msg, provider_configured = send_otp_sms(profile.phone_number, otp)
-
             request.session['pending_user_id'] = user.id
-            request.session['sms_provider_configured'] = provider_configured
 
-            if provider_configured and sms_success:
-                masked = f"+91 ••••• •{profile.phone_number[-4:]}" if len(profile.phone_number) >= 4 else profile.phone_number
-                messages.success(request, f"🌱 Registration details submitted! A 6-digit OTP code has been dispatched via SMS to {masked}.")
-            elif not provider_configured:
-                messages.warning(
-                    request,
-                    "⚠️ SMS Provider (Twilio) is not configured in .env. Real SMS could not be sent. "
-                    "For development testing, check your server terminal console for the verification code."
-                )
-            else:
-                messages.warning(request, f"⚠️ SMS could not be delivered: {sms_msg}")
-
+            messages.success(
+                request,
+                "🌱 Registration details submitted! Enter the 6-digit verification code shown below to activate your account."
+            )
             return redirect('verify_otp')
     else:
         initial_role = request.GET.get('role', 'customer')
@@ -125,7 +114,7 @@ def register_view(request):
 
 
 def verify_otp_view(request):
-    """Secure OTP Verification step before activating user account (No on-screen OTP code)"""
+    """Direct on-screen OTP verification step without external SMS errors"""
     user_id = request.session.get('pending_user_id')
     if not user_id:
         messages.warning(request, "Session expired or invalid. Please sign up or log in.")
@@ -142,7 +131,6 @@ def verify_otp_view(request):
 
             if is_valid:
                 del request.session['pending_user_id']
-                request.session.pop('sms_provider_configured', None)
                 login(request, user)
                 display_name = user.first_name or user.username
                 messages.success(request, f"🎉 Verification successful! Welcome to FarmConnect, {display_name}.")
@@ -156,24 +144,16 @@ def verify_otp_view(request):
     else:
         form = OTPVerificationForm()
 
-    masked_phone = ''
-    if profile.phone_number:
-        raw = profile.phone_number
-        masked_phone = f"+91 ••••• •{raw[-4:]}" if len(raw) >= 4 else raw
-
-    provider_configured = request.session.get('sms_provider_configured', True)
-
     return render(request, 'auth/verify_otp.html', {
         'form': form,
         'user_obj': user,
         'profile': profile,
-        'masked_phone': masked_phone,
-        'provider_configured': provider_configured,
+        'screen_otp': profile.otp,
     })
 
 
 def resend_otp_view(request):
-    """Resend a fresh OTP with rate-limiting, cooldown, and carrier SMS dispatch"""
+    """Generates a fresh OTP directly on screen with 0 errors"""
     user_id = request.session.get('pending_user_id')
     if not user_id:
         messages.error(request, "Session expired. Please register again.")
@@ -182,26 +162,8 @@ def resend_otp_view(request):
     user = get_object_or_404(User, id=user_id)
     profile = get_user_profile(user)
 
-    can_resend, reason = profile.can_resend_otp()
-    if not can_resend:
-        messages.warning(request, f"⏳ {reason}")
-        return redirect('verify_otp')
-
     new_otp = profile.generate_otp(is_resend=True)
-    sms_success, sms_msg, provider_configured = send_otp_sms(profile.phone_number, new_otp)
-    request.session['sms_provider_configured'] = provider_configured
-
-    if provider_configured and sms_success:
-        messages.success(request, "📲 A new 6-digit verification code has been dispatched via SMS to your phone.")
-    elif not provider_configured:
-        messages.warning(
-            request,
-            "⚠️ SMS Provider (Twilio) is not configured in .env. "
-            "For development testing, check your server terminal console for the new OTP."
-        )
-    else:
-        messages.warning(request, f"⚠️ SMS could not be dispatched: {sms_msg}")
-
+    messages.info(request, "🔄 A fresh 6-digit verification code has been generated on screen.")
     return redirect('verify_otp')
 
 
@@ -219,14 +181,9 @@ def login_view(request):
             profile = get_user_profile(user)
 
             if profile and not profile.is_verified:
-                can_resend, _ = profile.can_resend_otp()
-                if can_resend:
-                    otp = profile.generate_otp(is_resend=False)
-                    _, _, provider_configured = send_otp_sms(profile.phone_number, otp)
-                    request.session['sms_provider_configured'] = provider_configured
-
+                profile.generate_otp(is_resend=False)
                 request.session['pending_user_id'] = user.id
-                messages.warning(request, "Please verify your account phone number using the OTP.")
+                messages.info(request, "Please enter your verification code below to activate your account.")
                 return redirect('verify_otp')
 
             login(request, user)
@@ -243,6 +200,8 @@ def login_view(request):
             return redirect('customer_browse')
         else:
             messages.error(request, "Invalid username or password.")
+
+    return render(request, 'auth/login.html')
 
     return render(request, 'auth/login.html')
 

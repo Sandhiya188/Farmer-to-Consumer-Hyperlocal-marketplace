@@ -1,45 +1,39 @@
 {% extends 'base.html' %}
 
-{% block title %}Verify Phone OTP - FarmConnect{% endblock %}
+{% block title %}Verify Account - FarmConnect{% endblock %}
 
 {% block content %}
 <div class="form-card otp-card">
-  <h2>Verify Your Mobile Number</h2>
+  <h2>Account Verification</h2>
   <p class="text-muted otp-subtitle">
-    A secure 6-digit verification code has been generated for 
-    <strong>{{ user_obj.first_name|default:user_obj.username }}</strong>
-    {% if masked_phone %}
-      at <strong>{{ masked_phone }}</strong>
-    {% endif %}.
+    Welcome <strong>{{ user_obj.first_name|default:user_obj.username }}</strong>! 
+    Enter the 6-digit verification code below to activate your account.
   </p>
 
-  {% if not provider_configured %}
-    <div class="alert alert-warning text-left mb-3" style="text-align: left; font-size: 0.9rem;">
-      <strong>⚠️ Carrier SMS Gateway Notice:</strong><br>
-      Twilio credentials (<code style="font-size: 0.85rem;">TWILIO_ACCOUNT_SID</code>, <code style="font-size: 0.85rem;">TWILIO_AUTH_TOKEN</code>, <code style="font-size: 0.85rem;">TWILIO_PHONE_NUMBER</code>) are not configured in your <code>.env</code> file. 
-      Real carrier SMS could not be sent to your phone.
-      <br><br>
-      <strong>Testing Locally:</strong> Check your <strong>Django server terminal / console</strong> to view the dispatched verification code.
-    </div>
-  {% else %}
-    <div class="alert alert-info text-left mb-3" style="text-align: left; font-size: 0.9rem;">
-      <strong>📲 SMS Sent:</strong> Please check your mobile phone for an SMS containing your 6-digit code. The code expires in <strong>5 minutes</strong>.
+  <!-- Direct On-Screen Verification Code Display -->
+  {% if screen_otp %}
+    <div class="otp-screen-box">
+      <span class="otp-screen-label">YOUR 6-DIGIT VERIFICATION CODE</span>
+      <div class="otp-code-highlight" id="screen-otp-display">{{ screen_otp }}</div>
+      <button type="button" class="btn btn-outline btn-sm otp-autofill-btn" onclick="autoFillCode('{{ screen_otp }}')">
+        ⚡ Click to Auto-Fill Code
+      </button>
+      <small class="text-muted d-block mt-2">
+        Click the button above or type the 6 digits into the field below.
+      </small>
     </div>
   {% endif %}
 
-  <form method="POST" novalidate>
+  <form method="POST" novalidate id="otp-form">
     {% csrf_token %}
     <div class="form-group">
       <label class="form-label fw-bold" for="{{ form.otp.id_for_label }}">
-        Enter 6-Digit Verification Code
+        Enter Verification Code
       </label>
       {{ form.otp }}
       {% if form.otp.errors %}
         <small class="form-error d-block mt-1">{{ form.otp.errors.0 }}</small>
       {% endif %}
-      <small class="text-muted d-block mt-1">
-        Code expires in 5 minutes • Maximum 5 verification attempts allowed.
-      </small>
     </div>
 
     <button type="submit" class="btn btn-primary btn-lg full-width mt-2">
@@ -48,10 +42,40 @@
   </form>
 
   <div class="otp-resend-row">
-    <span>Didn't receive the SMS?</span>
+    <span>Need a new code?</span>
     <a href="{% url 'resend_otp' %}" class="btn btn-outline btn-sm" id="btn-resend-otp">
-      Resend SMS OTP
+      🔄 Generate New Code
     </a>
   </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function autoFillCode(code) {
+    const input = document.getElementById('{{ form.otp.id_for_label }}') || document.querySelector('input[name="otp"]');
+    if (input) {
+      input.value = code;
+      input.focus();
+      // Visual feedback
+      const btn = document.querySelector('.otp-autofill-btn');
+      if (btn) {
+        btn.innerHTML = '✅ Code Filled!';
+        btn.classList.remove('btn-outline');
+        btn.classList.add('btn-success');
+        setTimeout(() => {
+          btn.innerHTML = '⚡ Click to Auto-Fill Code';
+          btn.classList.remove('btn-success');
+          btn.classList.add('btn-outline');
+        }, 2000);
+      }
+    }
+  }
+
+  // Auto-focus the OTP input field on page load
+  document.addEventListener('DOMContentLoaded', function() {
+    const input = document.querySelector('input[name="otp"]');
+    if (input) input.focus();
+  });
+</script>
 {% endblock %}

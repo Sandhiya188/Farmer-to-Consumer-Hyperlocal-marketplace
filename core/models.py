@@ -29,30 +29,11 @@ class UserProfile(models.Model):
     otp_last_sent_at = models.DateTimeField(null=True, blank=True, help_text="Last OTP dispatch timestamp")
 
     def can_resend_otp(self):
-        """
-        Enforces OTP resend rate-limiting and abuse protection:
-        - 60-second cooldown between consecutive requests
-        - Maximum 3 resends per 15-minute window
-        """
-        now = timezone.now()
-        if self.otp_last_sent_at:
-            elapsed = (now - self.otp_last_sent_at).total_seconds()
-            if elapsed < 60:
-                wait_sec = int(60 - elapsed)
-                return False, f"Please wait {wait_sec} seconds before requesting a new OTP."
-
-            # Reset resend count if 15 minutes have passed
-            if elapsed > 900:
-                self.otp_resend_count = 0
-                self.save(update_fields=['otp_resend_count'])
-
-        if self.otp_resend_count >= 3:
-            return False, "Maximum resend limit reached (3 resends). Please try again after 15 minutes."
-
+        """Allows instant resend of verification code for demo and testing"""
         return True, ""
 
     def generate_otp(self, is_resend=False):
-        """Generates a secure 6-digit OTP code and updates audit timestamps"""
+        """Generates a secure 6-digit OTP code displayed directly on screen"""
         new_otp = f"{random.randint(100000, 999999)}"
         now = timezone.now()
         self.otp = new_otp
@@ -69,20 +50,17 @@ class UserProfile(models.Model):
 
     def verify_otp(self, entered_otp):
         """
-        Verifies entered OTP against stored hash/code with strict expiry & abuse limits.
+        Verifies entered OTP against stored code.
         Returns tuple: (is_valid: bool, message: str)
         """
-        if not self.otp or not self.otp_created_at:
-            return False, "No active OTP found. Please request a new verification code."
+        if not self.otp:
+            return False, "No active verification code found. Please generate a new code."
 
-        # Abuse protection: max 5 failed attempts
-        if self.otp_attempts >= 5:
-            return False, "Maximum verification attempts exceeded (5/5). Please request a fresh OTP."
-
-        # Expiry check: 5 minutes
-        expiry_time = self.otp_created_at + timezone.timedelta(minutes=5)
-        if timezone.now() > expiry_time:
-            return False, "OTP has expired (valid for 5 minutes). Please click 'Resend OTP'."
+        # Expiry check: 30 minutes
+        if self.otp_created_at:
+            expiry_time = self.otp_created_at + timezone.timedelta(minutes=30)
+            if timezone.now() > expiry_time:
+                return False, "Verification code has expired. Please click 'Generate New Code'."
 
         if str(self.otp).strip() == str(entered_otp).strip():
             self.is_verified = True
@@ -90,14 +68,14 @@ class UserProfile(models.Model):
             self.otp_attempts = 0
             self.otp_resend_count = 0
             self.save(update_fields=['is_verified', 'otp', 'otp_attempts', 'otp_resend_count'])
-            return True, "Phone number verified successfully!"
+            return True, "Account verified successfully!"
 
         self.otp_attempts += 1
         self.save(update_fields=['otp_attempts'])
-        remaining = 5 - self.otp_attempts
-        if remaining <= 0:
-            return False, "Maximum verification attempts exceeded. Please request a new OTP."
-        return False, f"Incorrect verification code. {remaining} attempt(s) remaining."
+        remaining = max(0, 5 - self.otp_attempts)
+        if remaining == 0:
+            return False, "Maximum verification attempts exceeded. Please click 'Generate New Code'."
+        return False, f"Incorrect verification code. Please enter the code shown on screen ({remaining} attempts left)."
 
     def __str__(self):
         return f"{self.user.username} ({self.get_role_display()} - {self.location})"

@@ -1337,15 +1337,36 @@ footer a {
 /* OTP Components */
 .otp-card { max-width: 480px; text-align: center; }
 .otp-subtitle { font-size: 0.95rem; margin: 0.5rem 0 1.5rem 0; }
-.otp-demo-box {
+.otp-screen-box {
   background: var(--primary-light);
-  border: 1.5px dashed var(--accent);
-  border-radius: 10px;
-  padding: 0.85rem;
+  border: 2px dashed var(--primary);
+  border-radius: var(--radius);
+  padding: 1.25rem 1rem;
   margin-bottom: 1.5rem;
+  text-align: center;
 }
-.otp-demo-label { color: var(--primary); font-weight: 700; display: block; letter-spacing: 0.05em; }
-.otp-demo-code { font-size: 1.8rem; font-weight: 800; letter-spacing: 0.25rem; color: var(--primary); }
+.otp-screen-label {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--primary);
+  letter-spacing: 0.1em;
+  display: block;
+  margin-bottom: 0.35rem;
+}
+.otp-code-highlight {
+  font-size: 2.2rem;
+  font-weight: 800;
+  letter-spacing: 0.4rem;
+  color: var(--primary);
+  margin-bottom: 0.75rem;
+  font-family: monospace;
+}
+.otp-autofill-btn {
+  font-weight: 700;
+  padding: 0.45rem 1.15rem;
+  border-radius: 999px;
+  transition: var(--transition);
+}
 .otp-resend-row {
   margin-top: 1.5rem;
   font-size: 0.9rem;
