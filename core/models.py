@@ -202,8 +202,10 @@ class OrderItem(models.Model):
 
 
 @receiver(post_save, sender=User)
-def ensure_user_profile(sender, instance, created, **kwargs):
+def ensure_user_profile(sender, instance, created, raw=False, **kwargs):
     """Automatically ensure a UserProfile exists whenever a User is created (e.g. createsuperuser)"""
+    if raw:
+        return
     if created:
         UserProfile.objects.get_or_create(
             user=instance,

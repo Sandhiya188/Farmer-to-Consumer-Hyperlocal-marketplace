@@ -16,6 +16,16 @@ from .forms import UserRegistrationForm, OTPVerificationForm, ProductForm, Check
 from .sms_service import send_otp_sms
 
 
+def ensure_seed_data_loaded():
+    """Auto-seeds database with initial farmers, profiles, and produce on fresh deployments"""
+    try:
+        if UserProfile.objects.count() == 0 or Product.objects.count() == 0:
+            from django.core.management import call_command
+            call_command('loaddata', 'seed_data', verbosity=0)
+    except Exception:
+        pass
+
+
 def get_user_profile(user):
     """Safely retrieves or auto-creates UserProfile for a user to prevent RelatedObjectDoesNotExist."""
     if not user or not user.is_authenticated:
@@ -38,6 +48,7 @@ def get_user_profile(user):
 
 def home_view(request):
     """Landing page featuring interactive live farmer map and fresh harvests"""
+    ensure_seed_data_loaded()
     farmers = UserProfile.objects.filter(role='farmer').select_related('user')
     farmers_data = []
     for fp in farmers:
@@ -331,6 +342,7 @@ def update_order_status_view(request, order_id):
 
 def customer_browse_view(request):
     """Customer selects location, views nearby farmers, and browses fresh harvest"""
+    ensure_seed_data_loaded()
     location_query = request.GET.get('location', '').strip()
     category_query = request.GET.get('category', '').strip()
     search_query = request.GET.get('q', '').strip()

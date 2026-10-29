@@ -11,5 +11,5 @@ python manage.py collectstatic --no-input
 # 3. Apply database migrations
 python manage.py migrate
 
-# 4. Load initial farmers and produce listings if empty
-python manage.py loaddata core/fixtures/seed_data.json || true
+# 4. Load full dataset (All farmers, profiles, harvests, and orders)
+python manage.py loaddata seed_data

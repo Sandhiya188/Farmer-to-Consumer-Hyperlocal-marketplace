@@ -76,7 +76,7 @@
   "pk": 11,
   "fields": {
     "password": "pbkdf2_sha256$1500000$lMvkm9tTJtBiQG8QGGoKJ0$0s7gu9BUhvEJBW1l9nvwmdkCJ/4P+YVEnNMJ+9qdK48=",
-    "last_login": "2026-10-18T15:49:27.628Z",
+    "last_login": "2026-10-28T15:59:37.412Z",
     "is_superuser": true,
     "username": "farmership",
     "first_name": "",
@@ -175,6 +175,60 @@
     "is_staff": false,
     "is_active": true,
     "date_joined": "2026-10-18T16:19:43.988Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 22,
+  "fields": {
+    "password": "pbkdf2_sha256$1500000$v1syOXBxdJEJmdAOLcbEuw$j+/8RI+wiWh/y4UBWPsRXMWYH/jn0Y+u/Xj35ynYzfA=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "sandy",
+    "first_name": "sandhiya",
+    "last_name": "",
+    "email": "sandhiyag188@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-10-28T13:53:32.143Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 25,
+  "fields": {
+    "password": "pbkdf2_sha256$1500000$HvTPQrFmU1UG1g7FNb6V0f$3CGwEQAP9OAUfdxhgni54lAlm119F/+axkQ8PaEBrfM=",
+    "last_login": null,
+    "is_superuser": true,
+    "username": "farmconnect",
+    "first_name": "",
+    "last_name": "",
+    "email": "sandhiyag188@gmail.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-10-29T02:37:58.198Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 26,
+  "fields": {
+    "password": "pbkdf2_sha256$1500000$LBEgUIXs4U4cQYolniUbfG$xHpa8WiAO2Zsw84fe7P5gCWztKOiczkaVuzzC3CeN5s=",
+    "last_login": null,
+    "is_superuser": true,
+    "username": "farmconnects",
+    "first_name": "",
+    "last_name": "",
+    "email": "sandhiyag188@gmail.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-10-29T02:40:33.523Z",
     "groups": [],
     "user_permissions": []
   }
@@ -390,6 +444,69 @@
   }
 },
 {
+  "model": "core.userprofile",
+  "pk": 22,
+  "fields": {
+    "user": 22,
+    "role": "farmer",
+    "farm_name": "ganesan farms",
+    "phone_number": "8220265399",
+    "location": "attayampatty/salem",
+    "district": "Salem",
+    "address": "5/165 pethampatty",
+    "latitude": 18.5204,
+    "longitude": 73.8567,
+    "is_verified": false,
+    "otp": "326478",
+    "otp_created_at": "2026-10-28T13:53:34.323Z",
+    "otp_attempts": 0,
+    "otp_resend_count": 0,
+    "otp_last_sent_at": "2026-10-28T13:53:34.323Z"
+  }
+},
+{
+  "model": "core.userprofile",
+  "pk": 25,
+  "fields": {
+    "user": 25,
+    "role": "farmer",
+    "farm_name": "",
+    "phone_number": "",
+    "location": "Tamil Nadu",
+    "district": "Tamil Nadu",
+    "address": "",
+    "latitude": 18.5204,
+    "longitude": 73.8567,
+    "is_verified": true,
+    "otp": null,
+    "otp_created_at": null,
+    "otp_attempts": 0,
+    "otp_resend_count": 0,
+    "otp_last_sent_at": null
+  }
+},
+{
+  "model": "core.userprofile",
+  "pk": 26,
+  "fields": {
+    "user": 26,
+    "role": "farmer",
+    "farm_name": "",
+    "phone_number": "",
+    "location": "Tamil Nadu",
+    "district": "Tamil Nadu",
+    "address": "",
+    "latitude": 18.5204,
+    "longitude": 73.8567,
+    "is_verified": true,
+    "otp": null,
+    "otp_created_at": null,
+    "otp_attempts": 0,
+    "otp_resend_count": 0,
+    "otp_last_sent_at": null
+  }
+},
+{
   "model": "core.product",
   "pk": 16,
   "fields": {
@@ -549,6 +666,152 @@
     "image_url": "",
     "created_at": "2026-10-18T15:20:04.281Z",
     "updated_at": "2026-10-18T15:20:04.281Z"
+  }
+},
+{
+  "model": "core.order",
+  "pk": 1,
+  "fields": {
+    "order_number": "ORD-5B2B7CF7",
+    "customer": 11,
+    "delivery_address": "5/165,pattavarthana kadu,Attayampatty",
+    "delivery_location": "salem",
+    "contact_phone": "8220265399",
+    "total_amount": "62.50",
+    "payment_method": "online_razorpay",
+    "payment_status": "pending",
+    "razorpay_order_id": "order_mock_8add6f3f0eff",
+    "razorpay_payment_id": null,
+    "order_status": "placed",
+    "created_at": "2026-10-18T15:09:46.845Z",
+    "updated_at": "2026-10-18T15:09:46.845Z"
+  }
+},
+{
+  "model": "core.order",
+  "pk": 2,
+  "fields": {
+    "order_number": "ORD-A63495AF",
+    "customer": 11,
+    "delivery_address": "5/165,pattavarthana kadu,Attayampatty",
+    "delivery_location": "Tamil Nadu",
+    "contact_phone": "9876543210",
+    "total_amount": "32.00",
+    "payment_method": "cod",
+    "payment_status": "pending",
+    "razorpay_order_id": null,
+    "razorpay_payment_id": null,
+    "order_status": "placed",
+    "created_at": "2026-10-18T15:14:59.936Z",
+    "updated_at": "2026-10-18T15:14:59.936Z"
+  }
+},
+{
+  "model": "core.order",
+  "pk": 3,
+  "fields": {
+    "order_number": "ORD-92DBB986",
+    "customer": 11,
+    "delivery_address": "5/165,pattavarthana kadu,Attayampatty",
+    "delivery_location": "Tamil Nadu",
+    "contact_phone": "9876543210",
+    "total_amount": "70.00",
+    "payment_method": "cod",
+    "payment_status": "pending",
+    "razorpay_order_id": null,
+    "razorpay_payment_id": null,
+    "order_status": "ready",
+    "created_at": "2026-10-18T15:20:42.889Z",
+    "updated_at": "2026-10-18T16:15:20.710Z"
+  }
+},
+{
+  "model": "core.order",
+  "pk": 4,
+  "fields": {
+    "order_number": "ORD-97112D60",
+    "customer": 11,
+    "delivery_address": "123 Farm Street, Coimbatore",
+    "delivery_location": "Coimbatore",
+    "contact_phone": "9876543210",
+    "total_amount": "35.00",
+    "payment_method": "upi",
+    "payment_status": "completed",
+    "razorpay_order_id": null,
+    "razorpay_payment_id": "UPI987654321012",
+    "order_status": "ready",
+    "created_at": "2026-10-18T15:49:27.831Z",
+    "updated_at": "2026-10-18T16:15:12.900Z"
+  }
+},
+{
+  "model": "core.orderitem",
+  "pk": 1,
+  "fields": {
+    "order": 1,
+    "farmer": 14,
+    "product": 22,
+    "product_name": "Seedless Sweet Black Grapes",
+    "quantity": "0.50",
+    "unit": "kg",
+    "price_per_kg": "90.00",
+    "subtotal": "45.00"
+  }
+},
+{
+  "model": "core.orderitem",
+  "pk": 2,
+  "fields": {
+    "order": 1,
+    "farmer": 12,
+    "product": 16,
+    "product_name": "Fresh Red Country Tomatoes",
+    "quantity": "0.50",
+    "unit": "kg",
+    "price_per_kg": "35.00",
+    "subtotal": "17.50"
+  }
+},
+{
+  "model": "core.orderitem",
+  "pk": 3,
+  "fields": {
+    "order": 2,
+    "farmer": 15,
+    "product": 23,
+    "product_name": "Sun-Dried Red Onions",
+    "quantity": "1.00",
+    "unit": "kg",
+    "price_per_kg": "32.00",
+    "subtotal": "32.00"
+  }
+},
+{
+  "model": "core.orderitem",
+  "pk": 4,
+  "fields": {
+    "order": 3,
+    "farmer": 11,
+    "product": 24,
+    "product_name": "Ladies Finger",
+    "quantity": "2.00",
+    "unit": "kg",
+    "price_per_kg": "35.00",
+    "subtotal": "70.00"
+  }
+},
+{
+  "model": "core.orderitem",
+  "pk": 5,
+  "fields": {
+    "order": 4,
+    "farmer": 11,
+    "product": 24,
+    "product_name": "Ladies Finger",
+    "quantity": "1.00",
+    "unit": "kg",
+    "price_per_kg": "35.00",
+    "subtotal": "35.00"
   }
 }
 ]
